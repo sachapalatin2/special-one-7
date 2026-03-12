@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Special One — Football Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#06080F;
+  --ink2:#0C1120;
+  --blue:#1A56FF;
+  --blue2:#3B82F6;
+  --ice:rgba(59,130,246,0.12);
+  --mist:rgba(255,255,255,0.04);
+  --edge:rgba(255,255,255,0.06);
+  --text:rgba(255,255,255,0.85);
+  --muted:rgba(255,255,255,0.3);
+  --dim:rgba(255,255,255,0.1);
+}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:default}
+
+/* ── LOADER ─────────────────────────────────── */
+#ldr{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;transition:opacity 1s ease,visibility 1s}
+#ldr.out{opacity:0;visibility:hidden}
+.l-num{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--dim);overflow:hidden;height:16px;margin-bottom:32px}
+.l-num span{display:block;animation:lnup .6s .1s ease both}
+.l-word{font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,12vw,160px);line-height:.9;color:#fff;overflow:hidden}
+.l-w1,.l-w2{display:block;overflow:hidden}
+.l-w1 span{display:block;animation:lnup 1s .05s cubic-bezier(.16,1,.3,1) both}
+.l-w2 span{display:block;animation:lnup 1s .18s cubic-bezier(.16,1,.3,1) both;color:var(--blue2)}
+.l-line{width:0;height:1px;background:linear-gradient(90deg,var(--blue2),transparent);margin-top:24px;animation:lline 1.2s .7s ease both}
+@keyframes lnup{from{transform:translateY(110%)}to{transform:translateY(0)}}
+@keyframes lline{to{width:280px}}
+
+/* ── NAV ─────────────────────────────────── */
+nav{position:fixed;top:0;inset-x:0;z-index:800;height:56px;display:flex;align-items:center;padding:0 48px;transition:background .3s,border .3s}
+nav.scr{background:rgba(6,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge)}
+.nlogo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;color:#fff;margin-right:40px;white-space:nowrap}
+.nlogo b{color:var(--blue2)}
+.ntabs{display:flex;height:56px;gap:2px}
+.nt{height:56px;padding:0 16px;background:none;border:none;border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:.3px;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.nt:hover{color:#fff}
+.nt.on{color:#fff;border-bottom-color:var(--blue2)}
+.ncta{background:var(--blue);color:#fff;border:none;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;letter-spacing:.3px;transition:background .2s,transform .15s;white-space:nowrap}
+.ncta:hover{background:#1444E0;transform:translateY(-1px)}
+/* Langue */
+.nlang{margin-left:auto;position:relative}
+.nlang-btn{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;background:rgba(255,255,255,.04);border:1px solid var(--edge);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .15s}
+.nlang-btn:hover{color:#fff;border-color:rgba(255,255,255,.14)}
+.nlang-dd{position:absolute;top:calc(100% + 8px);right:0;background:rgba(12,17,32,.97);border:1px solid var(--edge);border-radius:8px;overflow:hidden;min-width:120px;display:none;z-index:900;backdrop-filter:blur(20px)}
+.nlang-dd.open{display:block;animation:fdin .15s ease}
+.nlang-opt{width:100%;padding:10px 14px;background:none;border:none;text-align:left;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);cursor:pointer;transition:all .12s;display:block}
+.nlang-opt:hover{color:#fff;background:rgba(255,255,255,.04)}
+.nlang-opt.sel{color:var(--blue2)}
+.nav-cta-wrap{display:flex;align-items:center;gap:10px;margin-left:auto}
+
+/* ── CARTES FIFA ─────────────────────────────────── */
+.fifa-cards-wrap{margin-top:24px}
+.fifa-cards-wrap h4,.train-wrap h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--blue2);margin-bottom:14px}
+.fifa-cards{display:flex;flex-wrap:wrap;gap:12px}
+.fifa-card{background:linear-gradient(135deg,rgba(26,86,255,.18),rgba(59,130,246,.08));border:1px solid rgba(59,130,246,.3);border-radius:12px;padding:16px;min-width:150px;flex:1;max-width:180px}
+.fc-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid var(--edge);padding-bottom:10px}
+.fc-note{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--blue2);line-height:1}
+.fc-nom{font-size:12px;font-weight:600;color:#fff;line-height:1.3}
+.fc-attrs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fc-attr{display:flex;flex-direction:column;align-items:center}
+.fc-av{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:#fff}
+.fc-al{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+
+/* ── ENTRAÎNEMENTS ─────────────────────────────────── */
+.train-wrap{margin-top:24px}
+.train-card{background:var(--mist);border:1px solid var(--edge);border-radius:10px;padding:16px;margin-bottom:10px}
+.tr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tr-nom{font-weight:600;color:#fff;font-size:14px}
+.tr-dur{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 8px;border-radius:4px}
+.tr-obj{font-size:12px;color:var(--muted);margin-bottom:6px;font-style:italic}
+.tr-desc{font-size:13px;color:var(--text);line-height:1.6}
+
+/* ── CALENDRIER ENTRAÎNEMENTS ──────────────────────── */
+.cal-wrap{margin-top:28px}
+.cal-wrap h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--blue2);margin-bottom:16px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px}
+.cal-day{background:var(--mist);border:1px solid var(--edge);border-radius:8px;padding:8px 6px;text-align:center;min-height:64px;cursor:pointer;transition:all .18s;position:relative}
+.cal-day:hover{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.06)}
+.cal-day.has-session{border-color:rgba(59,130,246,.5);background:linear-gradient(135deg,rgba(26,86,255,.14),rgba(59,130,246,.06))}
+.cal-day.has-session:hover{border-color:var(--blue2)}
+.cal-day.rest{opacity:.45}
+.cal-dn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.cal-dd{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;line-height:1}
+.cal-dot{width:6px;height:6px;background:var(--blue2);border-radius:50%;margin:4px auto 0;box-shadow:0 0 6px rgba(59,130,246,.6)}
+.cal-session-label{font-size:9px;color:var(--blue2);margin-top:3px;line-height:1.2;font-weight:600}
+.cal-detail{background:rgba(12,17,32,.97);border:1px solid rgba(59,130,246,.3);border-radius:12px;padding:20px;margin-top:8px;display:none;animation:fdin .2s ease}
+.cal-detail.open{display:block}
+.cal-det-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cal-det-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#fff}
+.cal-det-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;transition:color .15s}
+.cal-det-close:hover{color:#fff}
+.cal-exo-list{display:flex;flex-direction:column;gap:10px}
+.cal-exo{background:var(--mist);border:1px solid var(--edge);border-radius:8px;padding:12px}
+.cal-exo-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cal-exo-name{font-weight:600;color:#fff;font-size:13px}
+.cal-exo-dur{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--blue2);background:rgba(59,130,246,.1);padding:2px 7px;border-radius:3px}
+.cal-exo-obj{font-size:11px;color:var(--muted);font-style:italic;margin-bottom:4px}
+.cal-exo-desc{font-size:12px;color:var(--text);line-height:1.5}
+.cal-prog-bar{height:3px;background:var(--dim);border-radius:2px;margin-top:10px;overflow:hidden}
+.cal-prog-fill{height:100%;background:linear-gradient(90deg,var(--blue2),#60a5fa);border-radius:2px;transition:width .6s ease}
+.cal-prog-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);text-align:right;margin-top:4px}
+
+/* ── STATS ÉVOLUTION ─────────────────────────────── */
+.stat-evo-wrap{margin-top:24px;background:linear-gradient(135deg,rgba(26,86,255,.1),rgba(59,130,246,.04));border:1px solid rgba(59,130,246,.25);border-radius:12px;padding:18px}
+.stat-evo-wrap h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--blue2);margin-bottom:14px}
+.stat-evo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-evo-item{text-align:center}
+.stat-evo-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;line-height:1;position:relative;display:inline-block}
+.stat-evo-delta{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;margin-left:4px;vertical-align:super}
+.stat-evo-delta.up{color:#34d399}
+.stat-evo-delta.same{color:var(--muted)}
+.stat-evo-delta.down{color:#f87171}
+.stat-evo-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:3px}
+.stat-evo-bar{height:3px;background:var(--dim);border-radius:2px;margin-top:5px;overflow:hidden}
+.stat-evo-fill{height:100%;background:linear-gradient(90deg,var(--blue2),#60a5fa);border-radius:2px;transition:width .8s ease}
+
+/* ── PAGES ─────────────────────────────────── */
+.page{display:none;min-height:100vh}
+.page.on{display:block}
+
+/* ═══════════════════════════════════════
+   HOME
+═══════════════════════════════════════ */
+#home{padding-top:56px}
+
+/* HERO */
+.hero{position:relative;min-height:calc(100vh - 56px);display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+/* BG */
+.hero-bg{position:absolute;inset:0;background:var(--ink)}
+.hero-noise{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:160px}
+.hero-glow{position:absolute;right:-10%;top:5%;width:70%;height:90%;background:radial-gradient(ellipse at 60% 40%,rgba(26,86,255,.13) 0%,rgba(59,130,246,.06) 35%,transparent 70%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:64px 64px}
+
+/* LEFT */
+.hero-l{position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center;padding:80px 72px 80px 64px}
+.htag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--blue2);text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fdin .5s .4s ease both}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(70px,7.5vw,120px);line-height:.92;letter-spacing:1px;margin-bottom:28px;opacity:0;animation:sup 1.1s .45s cubic-bezier(.16,1,.3,1) both}
+h1 .dim{color:rgba(255,255,255,.14);-webkit-text-stroke:1px rgba(255,255,255,.12)}
+h1 .blue{color:var(--blue2)}
+.hsub{font-size:15px;line-height:1.9;color:var(--muted);font-weight:300;max-width:420px;margin-bottom:44px;opacity:0;animation:fdin .7s .65s ease both}
+.hsub strong{color:rgba(255,255,255,.7);font-weight:500}
+.hbtns{display:flex;gap:12px;opacity:0;animation:fdin .6s .8s ease both}
+.btn-pri{background:var(--blue);color:#fff;border:none;padding:13px 26px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;letter-spacing:.2px}
+.btn-pri:hover{background:#1444E0;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--edge);padding:13px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;cursor:pointer;border-radius:7px;transition:all .2s}
+.btn-ghost:hover{color:#fff;border-color:rgba(255,255,255,.18)}
+.hstats{display:flex;gap:32px;margin-top:52px;padding-top:32px;border-top:1px solid var(--edge);opacity:0;animation:fdin .6s .95s ease both}
+.hstat .v{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;line-height:1}
+.hstat .v span{color:var(--blue2);font-size:20px}
+.hstat .k{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-top:3px}
+
+/* RIGHT – PLAYER */
+.hero-r{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.hero-r::after{content:'';position:absolute;bottom:0;inset-x:0;height:35%;background:linear-gradient(transparent,var(--ink));z-index:4}
+.hero-r::before{content:'';position:absolute;left:0;top:0;bottom:0;width:120px;background:linear-gradient(90deg,var(--ink),transparent);z-index:4}
+.player-wrap{position:relative;z-index:3;opacity:0;animation:sup 2s .3s cubic-bezier(.16,1,.3,1) both;transform-origin:bottom center}
+.player-glow{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:380px;height:160px;background:radial-gradient(ellipse,rgba(26,86,255,.22),transparent 70%);pointer-events:none;z-index:2}
+.p-svg{display:block;width:520px;height:auto;position:relative;z-index:3}
+/* Floating cards */
+.fc{position:absolute;z-index:6;background:rgba(12,17,32,.85);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);border-radius:10px;padding:12px 16px;opacity:0}
+.fc1{top:14%;right:8%;animation:fcin .6s 1.6s ease both}
+.fc2{top:42%;right:3%;animation:fcin .6s 1.8s ease both}
+.fc3{bottom:22%;left:8%;animation:fcin .6s 2s ease both}
+.fc .fv{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#fff;line-height:1}
+.fc .fv b{color:var(--blue2);font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500}
+.fc .fk{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-top:2px}
+@keyframes fdin{from{opacity:0}to{opacity:1}}
+@keyframes sup{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fcin{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+/* TICKER */
+.ticker{border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);overflow:hidden;padding:9px 0;background:rgba(255,255,255,.015)}
+.tk-row{display:inline-flex;animation:tkr 50s linear infinite;white-space:nowrap}
+@keyframes tkr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tk-item{display:inline-flex;align-items:center;gap:8px;padding:0 28px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.12);text-transform:uppercase}
+.tk-dot{width:3px;height:3px;border-radius:50%;background:var(--blue2);flex-shrink:0}
+
+/* SECTION COMMONS */
+.sec{padding:120px 72px}
+.sec-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--blue2);text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.sec-tag::before{content:'';width:16px;height:1px;background:var(--blue2)}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,5.5vw,76px);line-height:.95;color:#fff}
+.sec-title em{color:var(--blue2);font-style:normal}
+
+/* ── MANIFESTE ── */
+.manifeste{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--edge)}
+.mani-l{padding:120px 72px;border-right:1px solid var(--edge)}
+.mani-r{padding:120px 72px;display:flex;flex-direction:column;justify-content:flex-end}
+.mani-body{margin-top:40px}
+.mani-body p{font-size:15px;line-height:2;color:var(--muted);font-weight:300;margin-bottom:20px}
+.mani-body p strong{color:rgba(255,255,255,.72);font-weight:500}
+.manifesto-quote{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.2vw,46px);line-height:1.1;color:#fff;padding-bottom:40px;border-bottom:1px solid var(--edge);margin-bottom:40px}
+.manifesto-quote em{color:var(--blue2);font-style:normal}
+.mani-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px}
+.pill{border:1px solid var(--edge);border-radius:100px;padding:6px 14px;font-size:11px;font-weight:400;color:var(--muted);transition:all .2s;cursor:default}
+.pill:hover{color:#fff;border-color:rgba(255,255,255,.16)}
+
+/* ── CHIFFRES ── */
+.nums{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--edge)}
+.num-item{padding:56px 48px;border-right:1px solid var(--edge);cursor:default;position:relative;overflow:hidden;transition:background .2s}
+.num-item:last-child{border-right:none}
+.num-item::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue2),transparent);transform:scaleX(0);transform-origin:left;transition:transform .5s}
+.num-item:hover{background:var(--mist)}
+.num-item:hover::after{transform:scaleX(1)}
+.num-v{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:1;color:#fff;margin-bottom:4px}
+.num-v b{color:var(--blue2);font-size:32px}
+.num-k{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dim)}
+.num-d{font-size:12px;line-height:1.7;color:rgba(255,255,255,.12);margin-top:10px}
+
+/* ── HOW IT WORKS ── */
+.how{padding:120px 72px;border-bottom:1px solid var(--edge)}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge);margin-top:60px}
+.how-step{background:var(--ink);padding:48px 40px;position:relative;overflow:hidden;transition:background .2s}
+.how-step:hover{background:var(--ink2)}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:100px;color:rgba(255,255,255,.03);position:absolute;top:8px;right:12px;line-height:1}
+.step-icon{width:38px;height:38px;border-radius:8px;border:1px solid rgba(26,86,255,.25);background:rgba(26,86,255,.08);display:grid;place-items:center;margin-bottom:20px;color:var(--blue2)}
+.step-t{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:#fff;margin-bottom:10px}
+.step-d{font-size:13px;line-height:1.85;color:var(--muted)}
+
+/* ── CHAMPIONS ── */
+.champs-sec{padding:120px 72px;border-bottom:1px solid var(--edge)}
+.champs-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-top:52px}
+.champs-scroll::-webkit-scrollbar{display:none}
+.champ-card{flex-shrink:0;width:192px;background:var(--mist);border:1px solid var(--edge);border-radius:10px;padding:20px 16px;cursor:pointer;position:relative;overflow:hidden;transition:all .22s}
+.champ-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);transform:translateY(-2px)}
+.champ-num{position:absolute;top:-6px;right:8px;font-family:'Bebas Neue',sans-serif;font-size:80px;color:rgba(255,255,255,.025);line-height:1;pointer-events:none}
+.champ-flag{font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:4px;font-family:'DM Mono',monospace}
+.champ-name{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.5px;color:#fff;margin-bottom:1px;line-height:1.1}
+.champ-pos{font-size:10px;color:var(--muted);margin-bottom:14px}
+.attr-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.attr-k{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.15);width:22px;flex-shrink:0}
+.attr-bar{flex:1;height:2px;background:rgba(255,255,255,.05);border-radius:1px}
+.attr-fill{height:100%;background:var(--blue2);border-radius:1px}
+.attr-v{font-size:8px;font-weight:600;color:rgba(255,255,255,.2);width:18px;text-align:right}
+
+/* ── IA SECTION ── */
+.ia-sec{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--edge)}
+.ia-l{padding:120px 72px;border-right:1px solid var(--edge)}
+.ia-l .sec-title{margin-bottom:24px}
+.ia-body{font-size:15px;line-height:1.95;color:var(--muted);font-weight:300}
+.ia-body p{margin-bottom:18px}
+.ia-body strong{color:rgba(255,255,255,.7);font-weight:500}
+.ia-r{padding:80px 64px 80px 0;display:flex;align-items:center}
+.ia-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--edge);width:100%}
+.ia-cell{background:var(--ink2);padding:26px 24px}
+.ia-cv{font-family:'Bebas Neue',sans-serif;font-size:38px;color:#fff;line-height:1}
+.ia-cv b{color:var(--blue2);font-size:16px;font-family:'DM Sans',sans-serif;font-weight:400}
+.ia-ck{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-top:4px}
+.ia-bar{height:2px;background:rgba(255,255,255,.04);margin-top:14px}
+.ia-bfill{height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue))}
+
+/* ── MC APERCU ── */
+.mc-home{padding:120px 72px;border-bottom:1px solid var(--edge)}
+.mc-home-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge);margin-top:52px}
+.mc-home-item{background:var(--ink);padding:36px;cursor:pointer;position:relative;overflow:hidden;transition:background .18s;border:none;text-align:left}
+.mc-home-item:hover{background:var(--ink2)}
+.mc-home-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue2);transform:scaleY(0);transform-origin:top;transition:transform .3s}
+.mc-home-item:hover::before{transform:scaleY(1)}
+.mc-home-n{font-family:'Bebas Neue',sans-serif;font-size:64px;color:rgba(255,255,255,.035);line-height:1;margin-bottom:-4px}
+.mc-home-cat{display:inline-block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--blue2);background:rgba(26,86,255,.1);border-radius:3px;padding:3px 8px;margin-bottom:10px}
+.mc-home-t{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.3px;color:#fff;margin-bottom:8px}
+.mc-home-d{font-size:12px;line-height:1.75;color:var(--muted)}
+/* MC detail inline */
+.mc-detail{display:none;background:rgba(26,86,255,.04);border:1px solid rgba(26,86,255,.12);border-radius:12px;padding:36px;margin-top:24px}
+.mc-detail.on{display:block;animation:fdin .3s ease}
+.mcd-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.mcd-cat{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--blue2);margin-bottom:5px}
+.mcd-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.5px;color:#fff}
+.mcd-close{background:none;border:1px solid var(--edge);color:var(--muted);padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;border-radius:6px;transition:all .2s;flex-shrink:0}
+.mcd-close:hover{color:#fff;border-color:rgba(255,255,255,.2)}
+.mcd-body{font-size:14px;line-height:1.95;color:var(--muted)}
+.mcd-body strong{color:rgba(255,255,255,.7);font-weight:500}
+
+/* FOOTER */
+footer{padding:40px 72px;border-top:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center}
+.ft-brand{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.12)}
+.ft-brand b{color:var(--blue2)}
+footer p{font-size:11px;color:rgba(255,255,255,.08);font-family:'DM Mono',monospace;letter-spacing:1px}
+
+/* ═══════════════════════════════════════
+   MASTERCLASS PAGE
+═══════════════════════════════════════ */
+#masterclass{padding-top:56px}
+.page-hero{padding:80px 72px;border-bottom:1px solid var(--edge);background:linear-gradient(180deg,rgba(26,86,255,.06) 0%,transparent 100%)}
+.page-hero .sec-tag{margin-bottom:12px}
+.page-hero h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,6vw,80px);line-height:.95;color:#fff}
+.page-hero h2 em{color:var(--blue2);font-style:normal}
+.page-hero p{font-size:14px;color:var(--muted);max-width:500px;line-height:1.85;margin-top:14px;font-weight:300}
+.mc-page-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge)}
+.mc-page-item{background:var(--ink);padding:32px;cursor:pointer;position:relative;overflow:hidden;transition:background .18s;border-bottom:1px solid var(--edge);border:none;text-align:left}
+.mc-page-item:hover,.mc-page-item.act{background:var(--ink2)}
+.mc-page-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue2);transform:scaleY(0);transform-origin:top;transition:transform .3s}
+.mc-page-item:hover::before,.mc-page-item.act::before{transform:scaleY(1)}
+.mc-pn{font-family:'Bebas Neue',sans-serif;font-size:60px;color:rgba(255,255,255,.03);line-height:1;margin-bottom:-2px}
+.mc-pcat{display:inline-block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--blue2);background:rgba(26,86,255,.1);border-radius:3px;padding:3px 8px;margin-bottom:8px}
+.mc-ptit{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.3px;color:#fff;margin-bottom:6px}
+.mc-pdes{font-size:12px;line-height:1.7;color:var(--muted)}
+.mc-panel{display:none;border-top:1px solid rgba(26,86,255,.14);background:rgba(26,86,255,.03)}
+.mc-panel.on{display:block;animation:fdin .25s ease}
+.mc-panel-in{padding:52px 72px}
+.pan-cat{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--blue2);margin-bottom:8px}
+.pan-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.5px;color:#fff;margin-bottom:24px}
+.pan-body{font-size:15px;line-height:2;color:var(--muted);font-weight:300}
+.pan-body strong{color:rgba(255,255,255,.7);font-weight:500}
+
+/* ═══════════════════════════════════════
+   PROFIL PAGE
+═══════════════════════════════════════ */
+#profil{padding-top:56px}
+.pro-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.pro-col{padding:52px 64px;border-right:1px solid var(--edge)}
+.pro-col:last-child{border-right:none}
+.pro-section{margin-bottom:36px}
+.pro-sh{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.5px;color:#fff;padding-bottom:12px;border-bottom:1px solid var(--edge);margin-bottom:22px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:7px;padding:11px 14px;font-size:13px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;transition:border .18s,background .18s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:rgba(26,86,255,.45);background:rgba(26,86,255,.04)}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.1)}
+.fg select option{background:var(--ink2);color:#fff}
+.fg textarea{resize:vertical;min-height:80px;line-height:1.7}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn-save{width:100%;background:var(--blue);color:#fff;border:none;padding:13px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:7px;transition:background .2s;margin-top:4px;letter-spacing:.2px}
+.btn-save:hover{background:#1444E0}
+.save-ok{display:none;margin-top:12px;padding:11px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.15);border-radius:7px;font-size:12px;font-weight:500;color:#86EFAC;text-align:center;font-family:'DM Mono',monospace;letter-spacing:1px}
+/* auto-eval */
+.aev-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.aev-label{font-size:11px;color:var(--muted);width:88px;flex-shrink:0;font-weight:400}
+.aev-bar{flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;cursor:pointer;position:relative}
+.aev-fill{height:100%;background:var(--blue2);border-radius:2px;transition:width .25s}
+.aev-score{font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;width:22px;text-align:right}
+
+/* ═══════════════════════════════════════
+   ANALYSE PAGE
+═══════════════════════════════════════ */
+#analyse{padding-top:56px}
+.an-body{display:grid;grid-template-columns:200px 1fr}
+.an-nav{background:var(--ink);border-right:1px solid var(--edge);min-height:600px;padding:16px 0}
+.an-navit{width:100%;padding:13px 22px;border:none;border-left:2px solid transparent;background:none;text-align:left;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400;color:var(--muted);cursor:pointer;transition:all .15s;letter-spacing:.2px;display:block}
+.an-navit:hover{color:#fff;background:var(--mist)}
+.an-navit.on{color:#fff;border-left-color:var(--blue2);background:rgba(26,86,255,.05)}
+.an-cont{background:var(--ink);padding:52px}
+.amod{display:none}
+.amod.on{display:block;animation:fdin .25s ease}
+.amod-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.5px;color:#fff;margin-bottom:6px}
+.amod-sub{font-size:13px;color:var(--muted);margin-bottom:26px;line-height:1.8}
+.up-area{border:2px dashed rgba(255,255,255,.06);border-radius:10px;padding:56px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.015)}
+.up-area:hover{border-color:rgba(26,86,255,.3);background:rgba(26,86,255,.04)}
+.up-area h4{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px;color:rgba(255,255,255,.35);margin-bottom:6px}
+.up-area p{font-size:11px;color:rgba(255,255,255,.14);font-family:'DM Mono',monospace;letter-spacing:1px}
+.ai-txt{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:8px;padding:14px;font-size:13px;font-family:'DM Sans',sans-serif;color:#fff;min-height:120px;resize:vertical;outline:none;transition:border .18s;line-height:1.75}
+.ai-txt:focus{border-color:rgba(26,86,255,.38)}
+.ai-txt::placeholder{color:rgba(255,255,255,.1)}
+.ai-sub{background:var(--blue);color:#fff;border:none;padding:11px 24px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:7px;transition:background .2s;margin-top:10px;letter-spacing:.2px}
+.ai-sub:hover{background:#1444E0}
+.ai-res{background:rgba(26,86,255,.04);border:1px solid rgba(26,86,255,.12);border-radius:10px;padding:28px;margin-top:20px;display:none}
+.ai-res.on{display:block;animation:fdin .3s ease}
+.ai-res h4{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px;color:#fff;margin-bottom:14px}
+.ai-res p{font-size:13px;line-height:1.95;color:var(--muted);white-space:pre-wrap}
+.ld-dots{display:flex;gap:5px;margin-top:10px}
+.ld-dot{width:5px;height:5px;border-radius:50%;background:var(--blue2);animation:lddot 1.1s ease-in-out infinite}
+.ld-dot:nth-child(2){animation-delay:.15s}
+.ld-dot:nth-child(3){animation-delay:.3s}
+@keyframes lddot{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+
+/* À PROPOS */
+.apropos{padding:100px 64px;max-width:1200px;margin:0 auto}
+.apropos-in{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.apropos-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,4.5vw,72px);line-height:.92;color:#fff;margin:16px 0 28px}
+.apropos-title em{color:var(--blue2);font-style:normal}
+.apropos-body{font-size:14px;line-height:1.95;color:var(--muted);margin-bottom:16px;font-weight:300}
+.apropos-r{display:flex;flex-direction:column;gap:14px;padding-top:32px}
+.apropos-card{background:rgba(255,255,255,.025);border:1px solid var(--edge);border-radius:10px;padding:22px 24px;transition:border .2s}
+.apropos-card:hover{border-color:rgba(26,86,255,.2)}
+.ac-num{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--dim);margin-bottom:10px}
+.ac-label{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.5px;color:var(--blue2);margin-bottom:7px}
+.ac-val{font-size:12px;line-height:1.75;color:var(--muted);font-weight:300}
+
+/* SCROLL REVEAL */
+.sr{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.sr.vis{opacity:1;transform:none}
+.van-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.van-opt{background:rgba(255,255,255,.02);border:1px solid var(--edge);border-radius:8px;padding:14px;cursor:pointer;transition:all .18s;text-align:left}
+.van-opt:hover,.van-opt.sel{background:rgba(26,86,255,.06);border-color:rgba(26,86,255,.25)}
+.van-opt-t{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.3px;color:#fff;margin-bottom:3px}
+.van-opt-d{font-size:11px;color:var(--muted);line-height:1.5}
+.van-sep{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin:18px 0 10px;display:flex;align-items:center;gap:10px}
+.van-sep::after{content:'';flex:1;height:1px;background:var(--edge)}
+.geste-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+.geste-chip{padding:6px 12px;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:100px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;transition:all .15s}
+.geste-chip:hover,.geste-chip.sel{background:rgba(26,86,255,.1);border-color:rgba(26,86,255,.35);color:var(--blue2)}
+/* EQUIPE ANALYSE */
+.team-players{margin-top:14px}
+.team-row{display:flex;gap:8px;margin-bottom:8px}
+.team-inp{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:7px;padding:9px 12px;font-size:12px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;transition:border .18s}
+.team-inp:focus{border-color:rgba(26,86,255,.38)}
+.team-inp::placeholder{color:rgba(255,255,255,.1)}
+.team-pos{width:90px;background:rgba(255,255,255,.03);border:1px solid var(--edge);border-radius:7px;padding:9px 8px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--muted);outline:none;-webkit-appearance:none}
+.team-pos option{background:var(--ink2);color:#fff}
+.team-add{background:none;border:1px dashed rgba(255,255,255,.08);border-radius:7px;padding:8px;width:100%;color:var(--dim);font-size:11px;font-family:'DM Mono',monospace;letter-spacing:1px;cursor:pointer;transition:all .2s;margin-top:4px}
+.team-add:hover{border-color:rgba(26,86,255,.3);color:var(--blue2)}
+/* RAPPORT EQUIPE */
+.team-report{margin-top:8px}
+.team-report h4{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;color:#fff;margin-bottom:14px;border-bottom:1px solid var(--edge);padding-bottom:10px}
+.player-section{background:rgba(255,255,255,.02);border:1px solid var(--edge);border-radius:8px;padding:16px;margin-bottom:12px}
+.ps-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ps-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.3px;color:#fff}
+.ps-pos{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--blue2);text-transform:uppercase}
+.ps-body{font-size:12px;line-height:1.85;color:var(--muted)}
+.ps-stats{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.ps-stat{background:rgba(26,86,255,.06);border-radius:5px;padding:5px 10px}
+.ps-stat span{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff}
+.ps-stat small{display:block;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="ldr">
+  <div class="l-num"><span>// 2026.03 — FOOTBALL INTELLIGENCE</span></div>
+  <div class="l-word">
+    <div class="l-w1"><span>SPECIAL</span></div>
+    <div class="l-w2"><span>ONE</span></div>
+  </div>
+  <div class="l-line"></div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nlogo" onclick="go('home')">SPECIAL<b> ONE</b></div>
+  <div class="ntabs" id="ntabs">
+    <button class="nt on" onclick="go('home')" data-t="nav_home">Accueil</button>
+    <button class="nt" onclick="go('masterclass')" data-t="nav_mc">Masterclass</button>
+    <button class="nt" onclick="go('profil')" data-t="nav_profil">Mon Profil</button>
+    <button class="nt" onclick="go('analyse')" data-t="nav_ia">Analyse IA</button>
+  </div>
+  <div class="nav-cta-wrap">
+    <div class="nlang" id="langWrap">
+      <button class="nlang-btn" onclick="toggleLang()" id="langBtn">FR</button>
+      <div class="nlang-dd" id="langDd">
+        <button class="nlang-opt sel" onclick="setLang('fr')">FR — Francais</button>
+        <button class="nlang-opt" onclick="setLang('en')">EN — English</button>
+        <button class="nlang-opt" onclick="setLang('es')">ES — Espanol</button>
+        <button class="nlang-opt" onclick="setLang('pt')">PT — Portugues</button>
+      </div>
+    </div>
+    <button class="ncta" onclick="go('analyse')" data-t="nav_cta">Analyser mon jeu</button>
+  </div>
+</nav>
+
+<!-- ══════════ HOME ══════════ -->
+<div id="home" class="page on">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-noise"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-grid"></div>
+
+    <!-- LEFT -->
+    <div class="hero-l">
+      <div class="htag">Football Intelligence Platform</div>
+      <h1>LE FOOTBALL<br>D'<span class="blue">ELITE</span><br><span class="dim">ACCESSIBLE.</span></h1>
+      <p class="hsub">
+        <strong>Special One</strong> est la premiere plateforme d'intelligence footballistique. 
+        Masterclasses inspirees des meilleurs joueurs au monde. Analyse IA de ton jeu. 
+        Plans d'entrainement personnalises.
+      </p>
+      <div class="hbtns">
+        <button class="btn-pri" onclick="go('masterclass')">Explorer les masterclasses</button>
+        <button class="btn-ghost" onclick="go('analyse')">Analyser mon jeu</button>
+      </div>
+      <div class="hstats">
+        <div class="hstat"><div class="v">28<b> champ.</b></div><div class="k">Integres</div></div>
+        <div class="hstat"><div class="v">30<b> lecons</b></div><div class="k">Masterclasses</div></div>
+        <div class="hstat"><div class="v">IA<b> +</b></div><div class="k">Analyse</div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT – JOUEUR SVG -->
+    <div class="hero-r">
+      <div class="player-wrap">
+        <div class="player-glow"></div>
+
+        <!-- ======= SVG JOUEUR ======= -->
+        <svg class="p-svg" viewBox="0 0 540 740" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gs" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="rgba(120,160,255,0.22)"/>
+              <stop offset="100%" stop-color="rgba(59,130,246,0.08)"/>
+            </linearGradient>
+            <linearGradient id="gk" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(26,86,255,0.32)"/>
+              <stop offset="100%" stop-color="rgba(26,86,255,0.14)"/>
+            </linearGradient>
+            <linearGradient id="gsh" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(26,86,255,0.28)"/>
+              <stop offset="100%" stop-color="rgba(26,86,255,0.12)"/>
+            </linearGradient>
+            <filter id="blur2">
+              <feGaussianBlur stdDeviation="2"/>
+            </filter>
+            <filter id="blur4">
+              <feGaussianBlur stdDeviation="4"/>
+            </filter>
+          </defs>
+
+          <!-- Ombre sol -->
+          <ellipse cx="235" cy="718" rx="155" ry="14" fill="rgba(26,86,255,0.15)" filter="url(#blur4)"/>
+          <ellipse cx="235" cy="720" rx="90" ry="6" fill="rgba(26,86,255,0.08)"/>
+
+          <!-- Aura lumiere joueur -->
+          <ellipse cx="250" cy="380" rx="160" ry="280" fill="rgba(26,86,255,0.06)" filter="url(#blur4)"/>
+
+          <!-- ===== TETE ===== -->
+          <!-- Cou -->
+          <path d="M220 106 Q220 124 225 130 Q230 124 230 106Z" fill="url(#gs)" stroke="rgba(120,160,255,0.15)" stroke-width="1"/>
+          <!-- Tete ovale, inclinee vers l'avant (concentration) -->
+          <ellipse cx="225" cy="74" rx="36" ry="40" fill="url(#gs)" stroke="rgba(120,160,255,0.25)" stroke-width="1.5" filter="url(#blur2)" transform="rotate(-5 225 74)"/>
+          <!-- Cheveux courts -->
+          <path d="M192 58 Q196 28 225 24 Q254 28 258 58 Q246 44 225 42 Q204 44 192 58Z" fill="rgba(255,255,255,0.08)"/>
+          <!-- Oreilles -->
+          <ellipse cx="190" cy="72" rx="5" ry="7" fill="url(#gs)" stroke="rgba(120,160,255,0.12)" stroke-width="1"/>
+          <ellipse cx="260" cy="72" rx="5" ry="7" fill="url(#gs)" stroke="rgba(120,160,255,0.12)" stroke-width="1"/>
+          <!-- Sourcils expressis -->
+          <path d="M205 56 Q214 52 220 55" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M230 54 Q236 50 244 53" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Yeux — regardant le ballon (bas-droite) -->
+          <path d="M203 66 Q210 62 218 66 Q210 70 203 66Z" fill="rgba(255,255,255,0.12)"/>
+          <path d="M229 64 Q236 60 244 64 Q236 68 229 64Z" fill="rgba(255,255,255,0.12)"/>
+          <!-- Pupilles -->
+          <circle cx="213" cy="66" r="2.5" fill="rgba(255,255,255,0.25)"/>
+          <circle cx="239" cy="64" r="2.5" fill="rgba(255,255,255,0.25)"/>
+          <!-- Nez -->
+          <path d="M222 72 Q220 80 224 84" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- Bouche concentree serree -->
+          <path d="M214 91 Q225 93 235 91" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+          <!-- ===== CORPS / MAILLOT ===== -->
+          <!-- Epaules larges -->
+          <path d="M180 130 Q158 140 150 168 L152 200 Q158 220 170 235 L185 242 L225 234 L268 240 L282 232 Q296 218 298 198 L300 168 Q292 140 270 130 Q252 118 225 116 Q198 118 180 130Z"
+                fill="url(#gk)" stroke="rgba(59,130,246,0.3)" stroke-width="1.5" filter="url(#blur2)"/>
+          <!-- Col V -->
+          <path d="M208 130 L225 152 L242 130" stroke="rgba(255,255,255,0.16)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Liseree epaules -->
+          <path d="M180 130 Q225 150 270 130" stroke="rgba(59,130,246,0.45)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M152 185 Q145 184 140 178" stroke="rgba(59,130,246,0.2)" stroke-width="1" fill="none"/>
+          <path d="M298 185 Q305 184 310 178" stroke="rgba(59,130,246,0.2)" stroke-width="1" fill="none"/>
+          <!-- Numero 10 grand -->
+          <text x="192" y="222" font-family="'Bebas Neue',sans-serif" font-size="52" font-weight="900" fill="rgba(59,130,246,0.07)" letter-spacing="-2">10</text>
+          <!-- Crease central -->
+          <line x1="225" y1="154" x2="225" y2="240" stroke="rgba(59,130,246,0.08)" stroke-width="1"/>
+          <!-- Bas du maillot -->
+          <path d="M170 235 Q172 268 170 288 L225 298 L280 288 Q278 268 280 235 L225 242Z"
+                fill="url(#gk)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+
+          <!-- ===== BRAS GAUCHE (en l'air, equilibre course) ===== -->
+          <!-- Haut -->
+          <path d="M180 138 Q154 164 142 162 Q128 154 132 138 Q154 150 180 152Z"
+                fill="url(#gs)" stroke="rgba(120,160,255,0.15)" stroke-width="1.5"/>
+          <!-- Avant-bras -->
+          <path d="M142 162 Q118 164 104 178 Q98 188 105 196 Q122 178 144 174Z"
+                fill="url(#gs)" stroke="rgba(120,160,255,0.12)" stroke-width="1"/>
+          <!-- Poignet + main ouverte -->
+          <path d="M105 196 Q94 204 88 210 L100 222 Q110 208 118 200Z" fill="url(#gs)" stroke="rgba(120,160,255,0.12)" stroke-width="1"/>
+          <!-- Doigts -->
+          <path d="M88 210 Q80 208 76 214" stroke="rgba(120,160,255,0.12)" stroke-width="1" stroke-linecap="round"/>
+          <path d="M92 218 Q84 218 80 226" stroke="rgba(120,160,255,0.1)" stroke-width="1" stroke-linecap="round"/>
+          <path d="M100 222 Q94 224 90 232" stroke="rgba(120,160,255,0.1)" stroke-width="1" stroke-linecap="round"/>
+
+          <!-- ===== BRAS DROIT (vers l'arriere) ===== -->
+          <path d="M270 138 Q296 166 318 162 Q334 154 330 138 Q306 152 272 152Z"
+                fill="url(#gs)" stroke="rgba(120,160,255,0.15)" stroke-width="1.5"/>
+          <path d="M318 162 Q342 168 356 184 Q360 194 352 200 Q338 184 316 176Z"
+                fill="url(#gs)" stroke="rgba(120,160,255,0.12)" stroke-width="1"/>
+          <path d="M352 200 Q362 208 368 218 L356 228 Q346 214 338 208Z" fill="url(#gs)" stroke="rgba(120,160,255,0.12)" stroke-width="1"/>
+
+          <!-- ===== SHORT ===== -->
+          <path d="M170 288 Q165 326 163 362 L205 368 L225 352 L245 368 L287 362 Q285 326 280 288 L225 298Z"
+                fill="rgba(26,86,255,0.26)" stroke="rgba(26,86,255,0.45)" stroke-width="1.5"/>
+          <line x1="225" y1="300" x2="224" y2="364" stroke="rgba(26,86,255,0.3)" stroke-width="1"/>
+          <!-- Logo cuisse droite -->
+          <rect x="250" y="312" width="16" height="22" rx="3" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+          <path d="M254 318 Q258 322 262 318" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none" stroke-linecap="round"/>
+
+          <!-- ===== JAMBE GAUCHE (jambe d'appui, légèrement fléchie) ===== -->
+          <!-- Cuisse -->
+          <path d="M163 362 Q157 406 155 448 L185 456 L198 446 Q196 402 192 364Z"
+                fill="url(#gs)" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+          <!-- Genou -->
+          <ellipse cx="172" cy="452" rx="18" ry="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <!-- Mollet -->
+          <path d="M158 458 Q152 504 150 546 L178 552 L192 544 Q190 508 184 460Z"
+                fill="url(#gs)" stroke="rgba(255,255,255,0.06)" stroke-width="1.2"/>
+          <!-- Chaussette gauche -->
+          <path d="M152 546 Q148 570 146 588 L183 592 L187 586 Q185 574 180 548Z"
+                fill="url(#gsh)" stroke="rgba(26,86,255,0.35)" stroke-width="1"/>
+          <!-- Bande chaussette -->
+          <path d="M150 560 Q166 558 184 558" stroke="rgba(255,255,255,0.14)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Protege-tibia -->
+          <rect x="152" y="494" width="22" height="40" rx="5" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <!-- Chaussure gauche – posee au sol -->
+          <path d="M148 588 Q140 618 136 636 Q144 650 174 648 Q190 648 193 640 L189 630 Q172 634 152 626 L150 588Z"
+                fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)" stroke-width="1.5" filter="url(#blur2)"/>
+          <!-- Semelle -->
+          <path d="M136 640 Q146 652 174 650 Q192 650 196 644" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Lacets -->
+          <path d="M152 606 L180 602 M155 616 L180 613" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-linecap="round"/>
+
+          <!-- ===== JAMBE DROITE (en l'air, frappe) ===== -->
+          <!-- Cuisse en extension avant -->
+          <path d="M285 360 Q304 390 326 420 Q342 442 336 460 L310 466 L298 454 Q284 434 268 402 Q258 380 263 362Z"
+                fill="url(#gs)" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+          <!-- Genou droit -->
+          <ellipse cx="324" cy="460" rx="16" ry="12" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1" transform="rotate(-15 324 460)"/>
+          <!-- Mollet – prolongation de la frappe, pied tendu -->
+          <path d="M313 466 Q336 446 366 428 Q384 418 392 424 Q398 432 390 440 Q366 448 344 466 Q330 480 320 484Z"
+                fill="url(#gs)" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+          <!-- Chaussette droite -->
+          <path d="M320 482 Q336 498 358 494 Q382 488 392 476 Q398 466 394 456 Q376 466 356 478 Q336 484 322 482Z"
+                fill="url(#gsh)" stroke="rgba(26,86,255,0.35)" stroke-width="1"/>
+          <!-- Bande chaussette droite -->
+          <path d="M324 490 Q356 484 390 466" stroke="rgba(255,255,255,0.12)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Protege-tibia droit -->
+          <path d="M330 450 Q348 440 360 448 Q356 462 338 470Z" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <!-- Chaussure droite – en contact avec le ballon -->
+          <path d="M358 492 Q388 486 410 470 Q424 458 420 446 Q412 438 400 450 Q386 466 366 474 Q352 480 344 486Z"
+                fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" filter="url(#blur2)"/>
+          <!-- Semelle droite -->
+          <path d="M344 490 Q370 496 406 482 Q422 474 426 462" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- Lacets droite -->
+          <path d="M362 478 L394 466 M365 486 L394 476" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-linecap="round"/>
+
+          <!-- ===== BALLON ===== -->
+          <!-- Glow ballon -->
+          <circle cx="448" cy="450" r="38" fill="rgba(26,86,255,0.12)" filter="url(#blur4)"/>
+          <!-- Corps ballon -->
+          <circle cx="448" cy="450" r="32" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+          <!-- Pentagone central -->
+          <polygon points="448,430 464,440 460,456 436,456 432,440" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.14)" stroke-width="1.2"/>
+          <!-- Lignes ballon -->
+          <path d="M432 440 L420 432 M464 440 L476 432 M460 456 L468 468 M436 456 L428 468 M448 430 L448 416" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-linecap="round"/>
+          <!-- Trajectoire frappe – motion lines -->
+          <path d="M420 448 L376 444" stroke="rgba(255,255,255,0.07)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M418 456 L382 460" stroke="rgba(255,255,255,0.045)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M416 464 L388 472" stroke="rgba(255,255,255,0.025)" stroke-width="2" stroke-linecap="round"/>
+          <!-- Reflet haut-gauche ballon -->
+          <ellipse cx="438" cy="438" rx="8" ry="5" fill="rgba(255,255,255,0.1)" transform="rotate(-30 438 438)"/>
+
+          <!-- Motion lines corps (course) -->
+          <path d="M155 260 L128 258" stroke="rgba(59,130,246,0.09)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M153 272 L130 272" stroke="rgba(59,130,246,0.06)" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M151 283 L132 284" stroke="rgba(59,130,246,0.04)" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- Particules lumiere -->
+          <circle cx="108" cy="192" r="2.5" fill="rgba(59,130,246,0.5)"/>
+          <circle cx="92" cy="176" r="1.5" fill="rgba(59,130,246,0.3)"/>
+          <circle cx="80" cy="168" r="1" fill="rgba(59,130,246,0.2)"/>
+          <circle cx="460" cy="430" r="3" fill="rgba(59,130,246,0.6)"/>
+          <circle cx="474" cy="446" r="2" fill="rgba(59,130,246,0.35)"/>
+          <circle cx="466" cy="416" r="1.5" fill="rgba(59,130,246,0.2)"/>
+          <circle cx="106" cy="204" r="1" fill="rgba(59,130,246,0.15)"/>
+        </svg>
+        <!-- FIN SVG -->
+
+        <!-- Floating cards -->
+        <div class="fc fc1"><div class="fv">28<b> joueurs</b></div><div class="fk">Champions integres</div></div>
+        <div class="fc fc2"><div class="fv">IA</div><div class="fk">Analyse en temps reel</div></div>
+        <div class="fc fc3"><div class="fv">30<b> lecons</b></div><div class="fk">Masterclasses</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker"><div class="tk-row" id="tkr"></div></div>
+
+  <!-- MANIFESTE -->
+  <section class="manifeste sr">
+    <div class="mani-l">
+      <div class="sec-tag">Notre vision</div>
+      <div class="sec-title">Le football<br>d'<em>elite</em>,<br>accessible<br>a tous.</div>
+      <div class="mani-body">
+        <p><strong>Special One est nee d'une obsession :</strong> les methodes des meilleurs clubs au monde, les habitudes d'entrainement des meilleurs joueurs de la planete, n'ont aucune raison de rester inaccessibles.</p>
+        <p>On a passe des mois a decortiquer le jeu des <strong>28 plus grands footballeurs</strong> — leur technique, leur vision, leur rapport au corps, leur preparation mentale. On a distille tout ca en masterclasses concretes, applicables maintenant, peu importe ton niveau.</p>
+        <p>Puis on a ajoute une IA capable d'analyser ton jeu et de te construire un programme sur mesure, base sur le meme cadre que celui utilise dans les academies de Barcelone, Manchester City et du Real Madrid.</p>
+        <div class="mani-pills">
+          <span class="pill">Technique</span><span class="pill">Tactique</span>
+          <span class="pill">Mental</span><span class="pill">Physique</span>
+          <span class="pill">Vision du jeu</span><span class="pill">Leadership</span>
+          <span class="pill">Analyse IA</span><span class="pill">Plans personnalises</span>
+        </div>
+      </div>
+    </div>
+    <div class="mani-r">
+      <div class="manifesto-quote">
+        "Ce qui separe les grands joueurs des autres, ce n'est pas le talent. C'est la <em>methode.</em>"
+      </div>
+      <p style="font-size:13px;line-height:1.9;color:var(--muted);font-weight:300">Chaque element de cette plateforme existe pour une seule raison : te donner les memes outils que les joueurs qui ont accede au plus haut niveau. Pas des generiques. Pas des videos de motivation. Des <strong style="color:rgba(255,255,255,.65);font-weight:500">methodes eprouvees, concretes, directement applicables</strong> a ton entrainement du lendemain.</p>
+    </div>
+  </section>
+
+  <!-- CHIFFRES -->
+  <div class="nums sr">
+    <div class="num-item">
+      <div class="num-v">28<b>+</b></div>
+      <div class="num-k">Champions</div>
+      <div class="num-d">De Mbappe a Zidane. Chaque legende avec sa philosophie unique.</div>
+    </div>
+    <div class="num-item">
+      <div class="num-v">30<b>+</b></div>
+      <div class="num-k">Masterclasses</div>
+      <div class="num-d">Technique, tactique, mental, physique. Toutes les dimensions du jeu.</div>
+    </div>
+    <div class="num-item">
+      <div class="num-v">4<b>x</b></div>
+      <div class="num-k">Modules IA</div>
+      <div class="num-d">Video, description, plan d'entrainement, preparation mentale.</div>
+    </div>
+    <div class="num-item">
+      <div class="num-v">IA<b>+</b></div>
+      <div class="num-k">Personnalise</div>
+      <div class="num-d">Chaque analyse basee sur ton profil exact, ton poste et tes objectifs.</div>
+    </div>
+  </div>
+
+  <!-- FONCTIONNEMENT -->
+  <section class="how sr">
+    <div class="sec-tag">Fonctionnement</div>
+    <div class="sec-title">Trois etapes.<br>Un seul <em>objectif.</em></div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="step-num">01</div>
+        <div class="step-icon">→</div>
+        <div class="step-t">Tu remplis ton profil</div>
+        <div class="step-d">Poste, niveau, style de jeu, objectifs a 3 mois, auto-evaluation de tes attributs. En deux minutes, l'IA sait exactement qui tu es comme joueur et ce dont tu as besoin.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">02</div>
+        <div class="step-icon">→</div>
+        <div class="step-t">Tu explores les masterclasses</div>
+        <div class="step-d">30 lecons structurees autour des methodes des meilleurs joueurs au monde. Des cles concretes, des exercices precis, des principes immediatement applicables a ton prochain entrainement.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">03</div>
+        <div class="step-icon">→</div>
+        <div class="step-t">L'IA analyse et programme</div>
+        <div class="step-d">Video ou description de ton jeu. L'IA compare avec les meilleurs joueurs du monde et genere ton plan d'entrainement sur mesure — base sur les memes frameworks que les academies d'elite.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAMPIONS -->
+  <section class="champs-sec sr">
+    <div class="sec-tag">28 Champions integres</div>
+    <div class="sec-title">Ceux qui ont<br><em>redefini</em> le jeu.</div>
+    <div class="champs-scroll" id="cscrl"></div>
+  </section>
+
+  <!-- IA SECTION -->
+  <div class="ia-sec sr">
+    <div class="ia-l">
+      <div class="sec-tag">Intelligence artificielle</div>
+      <div class="sec-title">L'IA qui<br><em>comprend</em><br>ton jeu.</div>
+      <div class="ia-body" style="margin-top:24px">
+        <p>Upload une video de toi en match ou a l'entrainement. Decris tes forces et faiblesses en texte libre. Ou entre tes donnees physiques. <strong>L'IA analyse et compare aux meilleurs joueurs du monde.</strong></p>
+        <p>Elle identifie tes points forts, tes axes d'amelioration prioritaires, et cree ton programme semaine par semaine — inspire des methodes du Real Madrid, Man City et Barcelone.</p>
+        <p>Pas un bilan generique. Une analyse qui sait que tu es milieu relayeur de 19 ans, que ton pied gauche est faible, et que ton objectif est de passer regional d'ici 3 mois.</p>
+      </div>
+    </div>
+    <div class="ia-r">
+      <div class="ia-grid">
+        <div class="ia-cell"><div class="ia-cv">97<b>/100</b></div><div class="ia-ck">Vitesse — Mbappe</div><div class="ia-bar"><div class="ia-bfill" style="width:97%"></div></div></div>
+        <div class="ia-cell"><div class="ia-cv">99<b>/100</b></div><div class="ia-ck">Technique — Messi</div><div class="ia-bar"><div class="ia-bfill" style="width:99%"></div></div></div>
+        <div class="ia-cell"><div class="ia-cv">95<b>/100</b></div><div class="ia-ck">Vision — De Bruyne</div><div class="ia-bar"><div class="ia-bfill" style="width:95%"></div></div></div>
+        <div class="ia-cell"><div class="ia-cv">99<b>/100</b></div><div class="ia-ck">Mental — Ronaldo</div><div class="ia-bar"><div class="ia-bfill" style="width:99%"></div></div></div>
+        <div class="ia-cell"><div class="ia-cv">98<b>/100</b></div><div class="ia-ck">Pressing — Salah</div><div class="ia-bar"><div class="ia-bfill" style="width:98%"></div></div></div>
+        <div class="ia-cell"><div class="ia-cv">97<b>/100</b></div><div class="ia-ck">Dribble — Vinicius</div><div class="ia-bar"><div class="ia-bfill" style="width:97%"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MC APERCU -->
+  <section class="mc-home sr">
+    <div class="sec-tag">Apercu masterclasses</div>
+    <div class="sec-title">Des lecons que<br>personne ne t'a<br><em>jamais donnees.</em></div>
+    <div class="mc-home-grid" id="mchg"></div>
+    <div class="mc-detail" id="mcd">
+      <div class="mcd-head">
+        <div><div class="mcd-cat" id="mcd-c"></div><div class="mcd-title" id="mcd-t"></div></div>
+        <button class="mcd-close" onclick="closeMcd()">Fermer</button>
+      </div>
+      <div class="mcd-body" id="mcd-b"></div>
+    </div>
+  </section>
+
+  <!-- APROPOS -->
+  <section class="apropos sr">
+    <div class="apropos-in">
+      <div class="apropos-l">
+        <div class="sec-tag" data-t="about_tag">Notre histoire</div>
+        <div class="apropos-title" data-t="about_title">Deux freres.<br>Une <em>passion.</em></div>
+        <p class="apropos-body" data-t="about_body">Special One est ne d'une obsession : le football. Deux freres, passionnes par le foot depuis l'enfance, qui ont voulu creer la plateforme dont ils auraient eu besoin quand ils jouaient. Pas un contenu generique. Une vraie intelligence, qui comprend ton jeu et t'aide a progresser comme un pro.</p>
+        <p class="apropos-body" data-t="about_body2">On a pris les methodes des meilleurs clubs du monde, on les a transmises a une IA, et on a bati quelque chose d'accessible a tous — du joueur de district au semi-professionnel.</p>
+      </div>
+      <div class="apropos-r">
+        <div class="apropos-card">
+          <div class="ac-num">001</div>
+          <div class="ac-label" data-t="about_card1_l">La vision</div>
+          <div class="ac-val" data-t="about_card1_v">Rendre l'entrainement d'elite accessible a chaque joueur, peu importe son niveau.</div>
+        </div>
+        <div class="apropos-card">
+          <div class="ac-num">002</div>
+          <div class="ac-label" data-t="about_card2_l">La methode</div>
+          <div class="ac-val" data-t="about_card2_v">Les frameworks des meilleurs clubs du monde, adaptes a ton profil exact par l'IA.</div>
+        </div>
+        <div class="apropos-card">
+          <div class="ac-num">003</div>
+          <div class="ac-label" data-t="about_card3_l">L'ambition</div>
+          <div class="ac-val" data-t="about_card3_v">Devenir la reference mondiale du developpement du joueur de football.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ft-brand">SPECIAL<b> ONE</b></div>
+    <p data-t="footer_copy">// Football Intelligence Platform — 2026</p>
+  </footer>
+</div>
+
+<!-- ══════════ MASTERCLASS ══════════ -->
+<div id="masterclass" class="page">
+  <div class="page-hero">
+    <div class="sec-tag">Formation</div>
+    <h2><em>30</em> Masterclasses</h2>
+    <p>Des lecons construites autour des methodes des meilleurs joueurs et clubs du monde. Clique sur une lecon pour acceder au contenu complet.</p>
+  </div>
+  <div class="mc-page-grid" id="mcpg"></div>
+  <div class="mc-panel" id="mcp">
+    <div class="mc-panel-in">
+      <div class="pan-cat" id="pan-c"></div>
+      <div class="pan-title" id="pan-t"></div>
+      <div class="pan-body" id="pan-b"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PROFIL ══════════ -->
+<div id="profil" class="page">
+  <div class="page-hero">
+    <div class="sec-tag">Profil joueur</div>
+    <h2>Mon <em>Profil</em></h2>
+    <p>Complete ton profil pour que l'IA personnalise chaque analyse et plan d'entrainement en fonction de ton niveau, poste et objectifs reels.</p>
+  </div>
+  <div class="pro-body">
+    <!-- COL GAUCHE -->
+    <div class="pro-col">
+      <div class="pro-section">
+        <div class="pro-sh">Identite</div>
+        <div class="fg2">
+          <div class="fg"><label>Prenom</label><input type="text" id="p-prenom" placeholder="Kylian"></div>
+          <div class="fg"><label>Nom</label><input type="text" id="p-nom" placeholder="Dupont"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>Age</label><input type="number" id="p-age" placeholder="19" min="8" max="50"></div>
+          <div class="fg"><label>Nationalite</label><input type="text" id="p-nat" placeholder="Francaise"></div>
+        </div>
+        <div class="fg"><label>Club actuel</label><input type="text" id="p-club" placeholder="Ex: FC Nantes, AS Monaco, club amateur regional..."></div>
+        <div class="fg"><label>Email (optionnel)</label><input type="email" id="p-email" placeholder="joueur@exemple.fr"></div>
+      </div>
+
+      <div class="pro-section">
+        <div class="pro-sh">Position et style</div>
+        <div class="fg2">
+          <div class="fg"><label>Poste principal</label>
+            <select id="p-poste"><option value="">Selectionner</option><option>Gardien</option><option>Defenseur central</option><option>Lateral droit</option><option>Lateral gauche</option><option>Milieu defensif</option><option>Milieu relayeur</option><option>Milieu offensif</option><option>Ailier droit</option><option>Ailier gauche</option><option>Avant-centre</option><option>Faux 9</option></select>
+          </div>
+          <div class="fg"><label>Poste secondaire</label>
+            <select id="p-poste2"><option value="">Aucun</option><option>Gardien</option><option>Defenseur central</option><option>Lateral droit</option><option>Lateral gauche</option><option>Milieu defensif</option><option>Milieu relayeur</option><option>Milieu offensif</option><option>Ailier droit</option><option>Ailier gauche</option><option>Avant-centre</option></select>
+          </div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>Pied fort</label>
+            <select id="p-pied"><option value="">Selectionner</option><option>Pied droit</option><option>Pied gauche</option><option>Les deux pieds</option></select>
+          </div>
+          <div class="fg"><label>Niveau actuel</label>
+            <select id="p-niveau"><option value="">Selectionner</option><option>Debutant</option><option>Loisir</option><option>District</option><option>Regional</option><option>National</option><option>Semi-pro</option><option>Professionnel</option></select>
+          </div>
+        </div>
+        <div class="fg"><label>Style de jeu</label>
+          <select id="p-style"><option value="">Selectionner</option><option>Technique et dribbleur</option><option>Puissant et physique</option><option>Rapide et explosif</option><option>Organise et positionnel</option><option>Createur et passeur</option><option>Finisseur et buteur</option><option>Genereux au pressing</option><option>Leader et capitaine</option><option>Polyvalent</option></select>
+        </div>
+        <div class="fg"><label>Joueur de reference</label>
+          <select id="p-model"><option value="">Selectionner</option><option>Kylian Mbappe</option><option>Lionel Messi</option><option>Cristiano Ronaldo</option><option>Mohamed Salah</option><option>Vinicius Jr.</option><option>Jude Bellingham</option><option>Erling Haaland</option><option>Kevin De Bruyne</option><option>Pedri</option><option>Rodri</option><option>Lamine Yamal</option><option>Zinedine Zidane</option><option>Thierry Henry</option><option>Ronaldinho</option><option>Autre</option></select>
+        </div>
+        <div class="fg"><label>Systeme de jeu prefere</label>
+          <select id="p-sys"><option value="">Selectionner</option><option>4-3-3</option><option>4-2-3-1</option><option>3-5-2</option><option>4-4-2</option><option>3-4-3</option><option>5-3-2</option><option>4-1-4-1</option></select>
+        </div>
+      </div>
+
+      <div class="pro-section">
+        <div class="pro-sh">Donnees physiques</div>
+        <div class="fg3">
+          <div class="fg"><label>Taille (cm)</label><input type="number" id="p-taille" placeholder="178" min="140" max="220"></div>
+          <div class="fg"><label>Poids (kg)</label><input type="number" id="p-poids" placeholder="72" min="40" max="120"></div>
+          <div class="fg"><label>Vit. max km/h</label><input type="number" id="p-vit" placeholder="29" min="15" max="45"></div>
+        </div>
+        <div class="fg3">
+          <div class="fg"><label>Endurance (1-10)</label><input type="number" id="p-end" placeholder="7" min="1" max="10"></div>
+          <div class="fg"><label>Puissance (1-10)</label><input type="number" id="p-puis" placeholder="6" min="1" max="10"></div>
+          <div class="fg"><label>Explosivite (1-10)</label><input type="number" id="p-explo" placeholder="8" min="1" max="10"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>VO2max (si connu)</label><input type="number" id="p-vo2" placeholder="52" min="30" max="90"></div>
+          <div class="fg"><label>Km parcourus / match</label><input type="number" id="p-km" placeholder="10" min="1" max="20" step="0.5"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL DROITE -->
+    <div class="pro-col" style="border-right:none">
+      <div class="pro-section">
+        <div class="pro-sh">Objectifs et progression</div>
+        <div class="fg"><label>Objectif principal a 3 mois</label>
+          <textarea id="p-obj3" placeholder="Ex: Ameliorer ma prise de decision sous pression et ma precision de passe courte..."></textarea>
+        </div>
+        <div class="fg"><label>Ce que tu veux vraiment ameliorer</label>
+          <textarea id="p-amelio" placeholder="Ex: Je cours vite mais je perds trop de ballons. Mon pied gauche est faible. Je manque de vision quand je suis presse..."></textarea>
+        </div>
+        <div class="fg"><label>Ton plus grand point fort</label>
+          <textarea id="p-fort" placeholder="Ex: Ma vitesse et mon explosivite. Je peux battre n'importe qui en un-contre-un..." style="min-height:70px"></textarea>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>Seances / semaine</label>
+            <select id="p-seances"><option value="">Selectionner</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5 et plus</option></select>
+          </div>
+          <div class="fg"><label>Annees de pratique</label>
+            <select id="p-annees"><option value="">Selectionner</option><option>Moins d'1 an</option><option>1-3 ans</option><option>3-5 ans</option><option>5-10 ans</option><option>Plus de 10 ans</option></select>
+          </div>
+        </div>
+        <div class="fg"><label>Contexte d'entrainement</label>
+          <select id="p-ctx"><option value="">Selectionner</option><option>Club avec entraineur</option><option>Club + seances individuelles</option><option>Seances individuelles uniquement</option><option>Peu d'acces a un terrain</option><option>Preparation militaire / haute performance</option></select>
+        </div>
+        <div class="fg"><label>Blessures passees ou limitations physiques</label>
+          <textarea id="p-bless" placeholder="Ex: Entorse de la cheville droite (2023), douleur au genou gauche par intermittence..." style="min-height:60px"></textarea>
+        </div>
+      </div>
+
+      <div class="pro-section">
+        <div class="pro-sh">Contexte et historique</div>
+        <div class="fg"><label>Palmarès / distinctions notables</label>
+          <textarea id="p-palm" placeholder="Ex: Champion regional U19, meilleur buteur de district 2023..." style="min-height:60px"></textarea>
+        </div>
+        <div class="fg"><label>Entrainement video — regardes-tu tes matchs ?</label>
+          <select id="p-vid"><option value="">Selectionner</option><option>Jamais</option><option>Rarement</option><option>Parfois</option><option>Regulierement</option><option>Avant chaque match</option></select>
+        </div>
+        <div class="fg"><label>Preparation mentale actuelle</label>
+          <select id="p-mental"><option value="">Selectionner</option><option>Aucune</option><option>Quelques routines personnelles</option><option>Visualisation occasionnelle</option><option>Programme structure</option><option>Suivi par un professionnel</option></select>
+        </div>
+        <div class="fg"><label>Regime alimentaire suivi</label>
+          <select id="p-diet"><option value="">Selectionner</option><option>Standard / aucun suivi</option><option>Attention generale</option><option>Regime structure</option><option>Suivi par nutritionniste</option></select>
+        </div>
+      </div>
+
+      <div class="pro-section">
+        <div class="pro-sh">Auto-evaluation (clique sur la barre)</div>
+        <div id="aevbars"></div>
+      </div>
+
+      <button class="btn-save" onclick="saveProfil()">Sauvegarder mon profil</button>
+      <div class="save-ok" id="saveok">// PROFIL SAUVEGARDE — L'IA peut maintenant personnaliser tes analyses</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ANALYSE ══════════ -->
+<div id="analyse" class="page">
+  <div class="page-hero">
+    <div class="sec-tag">Intelligence artificielle</div>
+    <h2>Analyse <em>IA</em></h2>
+    <p>L'IA analyse ton jeu et le compare aux meilleurs joueurs du monde, puis genere un plan d'entrainement personnalise base sur ton profil.</p>
+  </div>
+  <div class="an-body">
+    <div class="an-nav">
+      <button class="an-navit on" onclick="showMod('video',this)">Analyse video</button>
+      <button class="an-navit" onclick="showMod('desc',this)">Decrire mon jeu</button>
+      <button class="an-navit" onclick="showMod('training',this)">Plan d'entrainement</button>
+      <button class="an-navit" onclick="showMod('mental',this)">Preparation mentale</button>
+    </div>
+    <div class="an-cont">
+      <div id="amod-video" class="amod on">
+        <div class="amod-title" data-t="vid_title">Analyse video</div>
+        <div class="amod-sub" data-t="vid_sub">Upload une video et configure ton analyse. L'IA s'adapte au contexte : individuel, action precise, ou analyse collective par joueur.</div>
+
+        <!-- MODE : individuel / action / equipe -->
+        <div class="van-sep" data-t="vid_mode_label">Mode d'analyse</div>
+        <div class="van-opts">
+          <div class="van-opt sel" id="mode-ind" onclick="selectMode('ind')">
+            <div class="van-opt-t" data-t="mode_ind_t">Individuel</div>
+            <div class="van-opt-d" data-t="mode_ind_d">Toi seul ou avec des partenaires. L'IA se concentre sur tes actions.</div>
+          </div>
+          <div class="van-opt" id="mode-action" onclick="selectMode('action')">
+            <div class="van-opt-t" data-t="mode_action_t">Action isolee</div>
+            <div class="van-opt-d" data-t="mode_action_d">Un geste precis a analyser : tacle, passe, tir, duel...</div>
+          </div>
+          <div class="van-opt" id="mode-team" onclick="selectMode('team')">
+            <div class="van-opt-t" data-t="mode_team_t">Analyse collective</div>
+            <div class="van-opt-d" data-t="mode_team_d">Video d'equipe. Rapport individuel par joueur et par section.</div>
+          </div>
+          <div class="van-opt" id="mode-full" onclick="selectMode('full')">
+            <div class="van-opt-t" data-t="mode_full_t">Match complet</div>
+            <div class="van-opt-d" data-t="mode_full_d">Analyse sur la duree : tendances, progression, zones de jeu.</div>
+          </div>
+        </div>
+
+        <!-- GESTE A ANALYSER -->
+        <div class="van-sep" data-t="vid_geste_label">Geste a analyser (optionnel)</div>
+        <div class="geste-grid" id="gesteGrid">
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Passe">Passe</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Tir">Tir</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Dribble">Dribble</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Tacle glisse">Tacle glisse</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Duel aerien">Duel aerien</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Controle de balle">Controle de balle</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Centre">Centre</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Positionnement">Positionnement</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Pressing">Pressing</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Deplacement sans ballon">Deplacement sans ballon</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Coup franc">Coup franc</div>
+          <div class="geste-chip" onclick="toggleGeste(this)" data-g="Vision du jeu">Vision du jeu</div>
+        </div>
+
+        <!-- JOUEURS (mode equipe) -->
+        <div id="teamSetup" style="display:none">
+          <div class="van-sep" data-t="team_players_label">Joueurs a analyser</div>
+          <div class="team-players" id="teamPlayers">
+            <div class="team-row"><input class="team-inp" placeholder="Nom du joueur 1" type="text"><select class="team-pos"><option>ATT</option><option>MIL</option><option>DEF</option><option>GK</option></select></div>
+            <div class="team-row"><input class="team-inp" placeholder="Nom du joueur 2" type="text"><select class="team-pos"><option>MIL</option><option>ATT</option><option>DEF</option><option>GK</option></select></div>
+            <div class="team-row"><input class="team-inp" placeholder="Nom du joueur 3" type="text"><select class="team-pos"><option>DEF</option><option>MIL</option><option>ATT</option><option>GK</option></select></div>
+          </div>
+          <button class="team-add" onclick="addPlayerRow()" data-t="team_add">+ Ajouter un joueur</button>
+          <div class="van-sep" data-t="team_section_label">Sections a analyser</div>
+          <div class="geste-grid">
+            <div class="geste-chip" onclick="toggleGeste(this)" data-g="Premiere mi-temps">1ere mi-temps</div>
+            <div class="geste-chip" onclick="toggleGeste(this)" data-g="Deuxieme mi-temps">2eme mi-temps</div>
+            <div class="geste-chip" onclick="toggleGeste(this)" data-g="Actions offensives">Offensif</div>
+            <div class="geste-chip" onclick="toggleGeste(this)" data-g="Actions defensives">Defensif</div>
+            <div class="geste-chip" onclick="toggleGeste(this)" data-g="Transitions">Transitions</div>
+            <div class="geste-chip" onclick="toggleGeste(this)" data-g="Coups de pied arretes">CPA</div>
+          </div>
+        </div>
+
+        <!-- CONTEXTE LIBRE -->
+        <div class="van-sep" data-t="vid_ctx_label">Contexte supplementaire (optionnel)</div>
+        <textarea class="ai-txt" id="vid-ctx" style="min-height:60px" placeholder="Ex: Je veux voir si mon tacle glisse est propre, si je reprends bien la trajectoire de balle apres..."></textarea>
+
+        <!-- UPLOAD -->
+        <div class="up-area" style="margin-top:14px" onclick="document.getElementById('vinput').click()">
+          <h4 data-t="vid_upload_h">Glisse ta video ici</h4>
+          <p data-t="vid_upload_p">// MP4, MOV — max 200MB — clic ou drag & drop</p>
+          <input type="file" id="vinput" accept="video/*" style="display:none" onchange="handleVid(this)">
+        </div>
+        <div class="ai-res" id="vres"></div>
+      </div>
+      <div id="amod-desc" class="amod">
+        <div class="amod-title">Decrire mon jeu</div>
+        <div class="amod-sub">Decris ton jeu en texte libre — qui tu es comme joueur, ce que tu fais bien, ce que tu veux ameliorer. L'IA analyse et te donne un retour expert.</div>
+        <textarea class="ai-txt" id="desc-in" placeholder="Je suis ailier droit de 20 ans, niveau regional. Je suis rapide et j'aime les dribbles mais j'ai du mal dans les duels defensifs et mes centres manquent de precision..."></textarea>
+        <button class="ai-sub" onclick="doDesc()">Analyser mon jeu</button>
+        <div class="ai-res" id="dres"></div>
+      </div>
+      <div id="amod-training" class="amod">
+        <div class="amod-title">Plan d'entrainement</div>
+        <div class="amod-sub">Decris ton objectif et ton niveau. L'IA genere un plan d'entrainement structure sur 4 semaines, inspire des methodes des meilleurs clubs europeens.</div>
+        <textarea class="ai-txt" id="train-in" placeholder="Milieu offensif de 22 ans, niveau regional. Je veux ameliorer ma vision du jeu et ma prise de decision comme Pedri ou De Bruyne..."></textarea>
+        <button class="ai-sub" onclick="doTraining()">Generer mon plan</button>
+        <div class="ai-res" id="tres"></div>
+      </div>
+      <div id="amod-mental" class="amod">
+        <div class="amod-title">Preparation mentale</div>
+        <div class="amod-sub">Le mental fait la difference au plus haut niveau. Decris tes defis mentaux et l'IA te donne les techniques des meilleurs athletes du monde.</div>
+        <textarea class="ai-txt" id="mental-in" placeholder="Je perds confiance apres une erreur, je stresse avant les grands matchs et j'ai du mal a m'exprimer quand le coach est la..."></textarea>
+        <button class="ai-sub" onclick="doMental()">Analyser mon mental</button>
+        <div class="ai-res" id="mres"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ──────────────── DATA ──────────────── */
+const CH=[
+  {n:"Kylian Mbappe",f:"France",p:"ATT · Real Madrid",num:7,a:{VIT:97,TEC:91,PHY:89,MEN:88}},
+  {n:"Lionel Messi",f:"Argentine",p:"ATT · Inter Miami",num:10,a:{VIT:82,TEC:99,PHY:72,MEN:97}},
+  {n:"Cristiano Ronaldo",f:"Portugal",p:"ATT · Al Nassr",num:7,a:{VIT:88,TEC:90,PHY:97,MEN:99}},
+  {n:"Mohamed Salah",f:"Egypte",p:"AIL · Liverpool",num:11,a:{VIT:93,TEC:89,PHY:82,MEN:92}},
+  {n:"Vinicius Jr.",f:"Bresil",p:"AIL · Real Madrid",num:7,a:{VIT:97,TEC:91,PHY:80,MEN:85}},
+  {n:"Jude Bellingham",f:"Angleterre",p:"MIL · Real Madrid",num:5,a:{VIT:85,TEC:88,PHY:90,MEN:95}},
+  {n:"Erling Haaland",f:"Norvege",p:"ATT · Man City",num:9,a:{VIT:92,TEC:82,PHY:96,MEN:88}},
+  {n:"Rodri",f:"Espagne",p:"MIL · Man City",num:16,a:{VIT:72,TEC:90,PHY:86,MEN:98}},
+  {n:"Pedri",f:"Espagne",p:"MIL · Barcelone",num:8,a:{VIT:78,TEC:95,PHY:74,MEN:90}},
+  {n:"Lamine Yamal",f:"Espagne",p:"AIL · Barcelone",num:19,a:{VIT:88,TEC:93,PHY:68,MEN:88}},
+  {n:"Kevin De Bruyne",f:"Belgique",p:"MIL · Man City",num:17,a:{VIT:80,TEC:94,PHY:80,MEN:95}},
+  {n:"Zinedine Zidane",f:"France",p:"Legende",num:5,a:{VIT:78,TEC:99,PHY:82,MEN:95}},
+  {n:"Thierry Henry",f:"France",p:"Legende",num:14,a:{VIT:96,TEC:92,PHY:88,MEN:91}},
+  {n:"Ronaldinho",f:"Bresil",p:"Legende",num:10,a:{VIT:86,TEC:99,PHY:78,MEN:90}},
+  {n:"Neymar Jr.",f:"Bresil",p:"ATT · Al Hilal",num:10,a:{VIT:91,TEC:97,PHY:75,MEN:84}},
+  {n:"Kaka",f:"Bresil",p:"Legende",num:22,a:{VIT:85,TEC:94,PHY:84,MEN:96}},
+];
+
+const MC=[
+  {n:"Premiere touche parfaite",c:"Technique",d:"Maitriser la reception de balle dans toutes les situations. Les exercices utilises dans les academies de Barcelone et du Real Madrid pour developper un toucher instinctif.",
+   full:"La premiere touche est ce qui separe les bons joueurs des grands joueurs. Pas besoin de ralentir pour controler — les meilleurs recoivent la balle deja en mouvement, deja orientes.\n\nDans les academies de Barcelone, les exercices de rondo sont construits autour d'une seule obsession : recevoir en se creant de l'espace avant meme que la balle n'arrive. Ton corps, ton epaule de reference, ta lecture de l'espace — tout se decide 0,5 seconde avant le contact.\n\nQuand la balle arrive, la decision est deja prise.\n\n<strong>Ce que tu vas travailler :</strong> controle en mouvement, orientation du corps avant reception, toucher du pied exterieur, amortis de poitrine et de cuisse sous pression.\n\n<strong>Exercice cle :</strong> Mur + 1 touche uniquement. Tu te places face a un mur, tu frappes, et chaque retour doit etre controle puis redistribue en une seule touche. Commence lentement, augmente la cadence."},
+  {n:"Dribble et prise de vitesse",c:"Technique",d:"Feinte de corps, crochet, elastico. Comment Mbappe et Vinicius combinent vitesse brute et technique pour desequilibrer en permanence.",
+   full:"Le dribble n'est pas un geste athletique. C'est un acte de decision. Mbappe ne dribble pas parce qu'il est le plus rapide — il dribble parce qu'il sait exactement quand et comment.\n\nLa feinte de corps parfaite commence par le regard. Tu fais croire que tu pars d'un cote avec les yeux, les epaules, les hanches — puis tu pars de l'autre avec le ballon. Le defenseur reagit a ton corps avant de reagir au ballon.\n\n<strong>Les 4 armes du dribbleur moderne :</strong>\n- La feinte d'appui (corps d'un cote, balle de l'autre)\n- L'acceleration brulee (1 touche au-dessus du genou du defenseur)\n- Le crochet interieur suivi d'un sprint\n- L'elastico (manipulation circulaire pour decaler le defenseur)\n\n<strong>Exercice de progression :</strong> slalom de plots avec variation de vitesse. Ce n'est pas aller vite entre les plots — c'est savoir ralentir pour accelerer."},
+  {n:"Vision du jeu a 360",c:"Tactique",d:"Developper une lecture du jeu comme De Bruyne ou Pirlo. Apprendre a scanner son environnement avant meme de recevoir la balle.",
+   full:"La vision du jeu ne s'acquiert pas en regardant le ballon. Elle s'acquiert en regardant tout sauf le ballon.\n\nDe Bruyne effectue en moyenne 8 a 12 scans par possession de 10 secondes. Chaque scan lui donne une image mise a jour : ou sont ses coequipiers, ou sont les defenseurs, quel espace va s'ouvrir.\n\nQuand la balle arrive, la decision est deja prise. C'est ca, jouer vite.\n\n<strong>Comment developper cette capacite :</strong>\n- Force-toi a regarder par-dessus ton epaule 2 fois avant chaque reception\n- Joue des rondos en equipe reduite\n- En match, identifie les 2-3 zones de jeu prioritaires avant que ton equipe recupere le ballon\n\n<strong>Le principe Pirlo :</strong> 'Je ne suis jamais surpris par ce qui se passe parce que je sais ce qui va se passer.'"},
+  {n:"Pressing et recuperation haute",c:"Physique",d:"Les methodes de pressing de Liverpool et Man City. Comment recuperer le ballon en 5 secondes apres une perte.",
+   full:"Le pressing moderne n'est pas une question de jambes — c'est une question de tete. Tu presses au bon moment ou tu ne presses pas.\n\nJurgen Klopp a revolutionne le football avec un concept simple : la transition defense-attaque doit commencer dans la seconde qui suit la perte de balle, quand le defenseur n'est pas encore en position.\n\n<strong>La regle des 5 secondes de Liverpool :</strong> dans les 5 secondes apres une perte, toute l'equipe presse intensement. Apres 5 secondes, si le ballon n'est pas recupere, l'equipe se replace en bloc. Pas de pressing individuel desordonne.\n\n<strong>Ce que tu peux travailler seul :</strong>\n- Le sprint de repositionnement apres perte (sprint 10-15m, arret, orientation)\n- L'angle de pressing : ne cours jamais vers le joueur adverse, cours vers l'espace qu'il veut atteindre\n- La communication : signale le pressing avant de l'engager"},
+  {n:"Mental de champion",c:"Mental",d:"Techniques de preparation mentale des sportifs d'elite. Comment Ronaldo gere la pression des grands matchs depuis 20 ans.",
+   full:"Cristiano Ronaldo s'entraine le jour de Noel. Il s'entraine apres chaque match perdu. Ce n'est pas de la discipline — c'est une philosophie.\n\nLa preparation mentale des champions repose sur 4 piliers :\n\n<strong>1. La visualisation positive :</strong> avant chaque match, Ronaldo visualise ses gestes reussis — ses frappes, ses accelerations, ses buts. Il programme son cerveau pour le succes.\n\n<strong>2. La gestion de l'erreur :</strong> les meilleurs ont une memoire courte pour les echecs. Messi rate un penalty en finale 2022 — il prend sa chance en tirs au but. L'erreur est consommee en 3 secondes.\n\n<strong>3. La routine pre-match :</strong> des ancres emotionnelles qui declenchent un etat de concentration optimal.\n\n<strong>4. Le dialogue interne :</strong> remplacer 'je vais rater' par 'je suis pret' n'est pas naive — c'est de la science cognitive."},
+  {n:"Puissance de frappe",c:"Technique",d:"Ameliorer la force et la precision des tirs. Technique d'appui, suivi du regard, rotation du bassin — les secrets des grands frappeurs.",
+   full:"Une bonne frappe n'est pas une question de muscles. C'est une question de chaine cinematique — de la prise d'appui a l'impact, tout le corps participe dans le bon ordre.\n\n<strong>La sequence parfaite :</strong>\n1. L'appui se place a cote et a 15-20cm du ballon, pointe orientee vers la cible\n2. Le backswing : hanche ouverte, genou flechi a 90\n3. Le contact : le coup-de-pied frappe le centre inferieur pour lever, le centre exact pour tendre\n4. Le suivi : la jambe continue son mouvement, ne s'arrete pas a l'impact\n\n<strong>Pour le pied faible :</strong> 15 minutes par session uniquement pied faible. Passes courtes d'abord, puis frappes statiques, puis en mouvement. 3 a 6 mois pour neutraliser l'asymetrie.\n\n<strong>Reference :</strong> Messi, naturellement gaucher, a developpe un pied droit suffisamment fiable pour tromper les meilleurs gardiens du monde. C'est du travail, pas de la genetique."},
+  {n:"Vitesse et explosivite",c:"Physique",d:"Developper la vitesse maximale et l'acceleration sur courte distance. Programme sprint et pliometrie inspire des clubs professionnels.",
+   full:"La vitesse se travaille. L'acceleration se travaille encore plus.\n\nLa difference entre Mbappe et un joueur rapide ordinaire ne tient pas a la vitesse maximale — elle tient aux 3 premieres foulees. Mbappe atteint 90% de sa vitesse maximale en 6 metres. C'est l'acceleration qui cree l'ecart.\n\n<strong>Programme 3 jours par semaine :</strong>\n\nJour 1 — Explosivite pure : 6x20m depart arrete, 5 minutes de recuperation. Focus sur les 3 premieres foulees.\n\nJour 2 — Pliometrie : sauts verticaux, sauts lateraux, bounding. 3 series de 8 repetitions.\n\nJour 3 — Vitesse maximale : 4x60m en allure maximale, recuperation complete (5-7 min). Ne jamais sprinter fatigue."},
+  {n:"Jeu sans ballon",c:"Tactique",d:"Les appels, les courses, les demarquages. Comment Haaland et Benzema se liberent de leur marqueur meme sans jamais toucher le ballon.",
+   full:"80% d'un match de football se joue sans ballon. Les grands attaquants ont compris ca mieux que quiconque.\n\nHaaland touche tres peu de ballons par match. Mais chacun de ses appels de balle cree un espace pour un partenaire. Ses courses sont comme des declencheurs.\n\n<strong>Les 3 types de course sans ballon :</strong>\n1. L'appel en profondeur : partir dans le dos de la defense pour etirer la ligne\n2. Le decalement : se deplacer lateralement pour liberer le couloir pour un partenaire\n3. Le faux appel : simuler un deplacement d'un cote pour partir de l'autre\n\n<strong>A travailler :</strong> en regardant tes matchs en video, compte combien de fois tu te deplaces sans ballon vs combien de fois tu restes statique."},
+  {n:"Leadership sur le terrain",c:"Mental",d:"Comment devenir un capitaine naturel. La communication, la gestuelle, l'influence sur le collectif.",
+   full:"Le leadership sur un terrain de foot ne se donne pas avec le brassard. Il se construit avec l'attitude, les mots et les actes.\n\nJohn Terry encourageait les joueurs apres chaque erreur. Sergio Ramos prenait les tirs au but en finale de LDC parce que personne ne voulait le faire. Thiago Silva pleurait apres une defaite et revenait au match suivant avec la meme intensite.\n\n<strong>Les 4 comportements du leader moderne :</strong>\n1. Etre le premier au duel\n2. Communiquer en permanence — instructions courtes, claires, positives\n3. Assumer les erreurs publiquement\n4. Celebrer les reussites de ses partenaires autant que les siennes\n\n<strong>Des maintenant :</strong> commence chaque entrainement en parlant aux 2 joueurs a cote de toi. Du soutien, pas de la tactique."},
+  {n:"Positionnement defensif",c:"Tactique",d:"Couverture, interception et lecture du jeu adverse. Les principes defensifs du Bayern Munich et de l'equipe de France.",
+   full:"Bien defendre, c'est lire le jeu avant que ca arrive. Pas courir derriere le ballon.\n\nVirgil van Dijk est toujours au bon endroit parce qu'il anticipe la passe avant qu'elle parte.\n\n<strong>Les 3 principes du positionnement defensif :</strong>\n\n1. L'angle de repli : place-toi toujours dans l'axe entre le ballon et ton but — pas entre le ballon et le joueur adverse.\n\n2. La distance d'engagement : ni trop pres (il passe dans ton dos), ni trop loin (il tire).\n\n3. La couverture collective : quand ton partenaire monte sur le ballon, positionne-toi en soutien a 45 pour intercepter la passe de degage."},
+  {n:"Centres et passes decisives",c:"Technique",d:"Creer des occasions depuis les ailes. Timing, precision, puissance — les secrets des meilleurs passeurs.",
+   full:"Un bon centre n'est pas un centre fort — c'est un centre au bon endroit au bon moment.\n\nTrent Alexander-Arnold ne frappe pas plus fort que les autres. Mais il voit l'espace avant tout le monde. Ses centres arrivent exactement la ou l'attaquant va etre — pas la ou il est.\n\n<strong>Les 3 zones de centre :</strong>\n1. Le premier poteau : balle tendue a ras de terre\n2. Le point de penalty : la balle flottee vers la zone de 11m\n3. Le second poteau : pour l'attaquant qui arrive en retard\n\n<strong>Progressions :</strong> 50 centres par seance uniquement, avec un partenaire qui marche sur les zones cibles."},
+  {n:"Coups francs et penaltys",c:"Technique",d:"La technique des meilleurs tireurs. Approche, contact, psychologie — comment transformer les situations de pression extreme.",
+   full:"Le penalty, c'est 11 metres, un gardien et toute la pression du monde dans la tete.\n\n<strong>La methode des tireurs de haut niveau :</strong>\n1. Decidez de votre cote AVANT de poser le ballon. Ne changez plus.\n2. Approche en 3-4 pas, course legerement excentree\n3. Regardez le gardien jusqu'a 2 pas, puis regardez votre zone cible\n4. Contact coup-de-pied dans le tiers inferieur\n5. Suivi de jambe complet\n\n<strong>Le coup franc :</strong> la rotation est tout. Pour faire monter puis descendre la balle, le pied frappe juste en dessous du centre avec un mouvement vers le haut. Zidane, Messi — milieu-interieur du pied pour maximiser le controle de la rotation.\n\n<strong>Regle d'or :</strong> 1 000 tirs, pas 10."},
+];
+
+/* ──────────────── I18N COMPLET ──────────────── */
+const TRANSLATIONS={
+  fr:{
+    nav_home:'Accueil',nav_mc:'Masterclass',nav_profil:'Mon Profil',nav_ia:'Analyse IA',nav_cta:'Analyser mon jeu',
+    hero_tag:'Football Intelligence Platform',
+    hero_h1:'LE FOOTBALL<br>D\'<span class="blue">ELITE</span><br><span class="dim">ACCESSIBLE.</span>',
+    hero_sub:'<strong>Special One</strong> est la premiere plateforme d\'intelligence footballistique. Masterclasses inspirees des meilleurs joueurs au monde. Analyse IA de ton jeu. Plans d\'entrainement personnalises.',
+    hero_btn1:'Explorer les masterclasses',hero_btn2:'Analyser mon jeu',
+    hero_stat1v:'28<b> champ.</b>',hero_stat1k:'Integres',hero_stat2v:'30<b> lecons</b>',hero_stat2k:'Masterclasses',hero_stat3v:'IA<b> +</b>',hero_stat3k:'Analyse',
+    num1k:'Champions',num1d:'De Mbappe a Zidane. Chaque legende avec sa philosophie unique.',
+    num2k:'Masterclasses',num2d:'Technique, tactique, mental, physique. Toutes les dimensions du jeu.',
+    num3k:'Modules IA',num3d:'Video, description, plan d\'entrainement, preparation mentale.',
+    num4k:'Personnalise',num4d:'Chaque analyse basee sur ton profil exact, ton poste et tes objectifs.',
+    how_tag:'Fonctionnement',how_title:'Trois etapes.<br>Un seul <em>objectif.</em>',
+    step1t:'Tu remplis ton profil',step1d:'Poste, niveau, style de jeu, objectifs a 3 mois, auto-evaluation de tes attributs. En deux minutes, l\'IA sait exactement qui tu es comme joueur.',
+    step2t:'Tu explores les masterclasses',step2d:'30 lecons structurees autour des methodes des meilleurs joueurs au monde. Des cles concretes, des exercices precis, immediatement applicables.',
+    step3t:'L\'IA analyse et programme',step3d:'Video ou description de ton jeu. L\'IA compare avec les meilleurs joueurs du monde et genere ton plan d\'entrainement sur mesure.',
+    champs_tag:'28 Champions integres',champs_title:'Ceux qui ont<br><em>redefini</em> le jeu.',
+    ia_tag:'Intelligence artificielle',ia_title:'L\'IA qui<br><em>comprend</em><br>ton jeu.',
+    ia_p1:'Upload une video de toi en match ou a l\'entrainement. Decris tes forces et faiblesses en texte libre. <strong>L\'IA analyse et compare aux meilleurs joueurs du monde.</strong>',
+    ia_p2:'Elle identifie tes points forts, tes axes d\'amelioration prioritaires, et cree ton programme semaine par semaine — inspire des methodes du Real Madrid, Man City et Barcelone.',
+    ia_p3:'Pas un bilan generique. Une analyse qui sait que tu es milieu relayeur de 19 ans, que ton pied gauche est faible, et que ton objectif est de passer regional d\'ici 3 mois.',
+    ia_btn:'Analyser mon jeu maintenant',
+    mc_tag:'Apercu masterclasses',mc_title:'Des lecons que<br>personne ne t\'a<br><em>jamais donnees.</em>',mc_close:'Fermer',
+    about_tag:'Notre histoire',about_title:'Deux freres.<br>Une <em>passion.</em>',
+    about_body:'Special One est ne d\'une obsession : le football. Deux freres, passionnes par le foot depuis l\'enfance, qui ont voulu creer la plateforme dont ils auraient eu besoin quand ils jouaient.',
+    about_body2:'On a pris les methodes des meilleurs clubs du monde, on les a transmises a une IA, et on a bati quelque chose d\'accessible a tous — du joueur de district au semi-professionnel.',
+    about_card1_l:'La vision',about_card1_v:'Rendre l\'entrainement d\'elite accessible a chaque joueur, peu importe son niveau.',
+    about_card2_l:'La methode',about_card2_v:'Les frameworks des meilleurs clubs du monde, adaptes a ton profil exact par l\'IA.',
+    about_card3_l:'L\'ambition',about_card3_v:'Devenir la reference mondiale du developpement du joueur de football.',
+    footer_copy:'// Football Intelligence Platform — 2026',
+    mc_page_tag:'Formation',mc_page_title:'<em>30</em> Masterclasses',mc_page_sub:'Des lecons construites autour des methodes des meilleurs joueurs et clubs du monde. Clique sur une lecon pour acceder au contenu complet.',
+    pro_tag:'Profil joueur',pro_title:'Mon <em>Profil</em>',pro_sub:'Complete ton profil pour que l\'IA personnalise chaque analyse et plan d\'entrainement en fonction de ton niveau, poste et objectifs reels.',
+    pro_sh1:'Identite',pro_sh2:'Position et style',pro_sh3:'Donnees physiques',pro_sh4:'Objectifs',pro_sh5:'Contexte et historique',pro_sh6:'Auto-evaluation 1-10',
+    pro_save:'Sauvegarder mon profil',pro_saved:'Profil sauvegarde',
+    an_tag:'Intelligence artificielle',an_title:'Analyse <em>IA</em>',an_sub:'L\'IA analyse ton jeu et le compare aux meilleurs joueurs du monde, puis genere un plan d\'entrainement personnalise.',
+    an_tab1:'Analyse video',an_tab2:'Decrire mon jeu',an_tab3:'Plan d\'entrainement',an_tab4:'Preparation mentale',
+    vid_title:'Analyse video',vid_sub:'Upload une video et configure ton analyse. L\'IA s\'adapte : individuel, action precise, ou collectif par joueur.',
+    vid_mode_label:'Mode d\'analyse',
+    mode_ind_t:'Individuel',mode_ind_d:'Toi seul ou avec partenaires. Focus sur tes actions.',
+    mode_action_t:'Action isolee',mode_action_d:'Un geste precis : tacle, passe, tir, duel...',
+    mode_team_t:'Analyse collective',mode_team_d:'Rapport individuel par joueur et section.',
+    mode_full_t:'Match complet',mode_full_d:'Analyse sur la duree : tendances, zones de jeu.',
+    vid_geste_label:'Geste a analyser (optionnel)',vid_ctx_label:'Contexte supplementaire (optionnel)',
+    vid_upload_h:'Glisse ta video ici',vid_upload_p:'// MP4, MOV — max 200MB — clic ou drag & drop',
+    team_players_label:'Joueurs a analyser',team_add:'+ Ajouter un joueur',team_section_label:'Sections a analyser',
+    desc_title:'Decrire mon jeu',desc_sub:'Decris ton jeu en texte libre. L\'IA analyse et te donne un retour expert.',
+    desc_ph:'Je suis ailier droit de 20 ans, niveau regional. Je suis rapide et j\'aime les dribbles mais j\'ai du mal dans les duels defensifs...',
+    desc_btn:'Analyser mon jeu',
+    train_title:'Plan d\'entrainement',train_sub:'Decris ton objectif et ton niveau. L\'IA genere un plan d\'entrainement structure sur 4 semaines.',
+    train_ph:'Milieu offensif de 22 ans, niveau regional. Je veux ameliorer ma vision du jeu et ma prise de decision...',
+    train_btn:'Generer mon plan',
+    mental_title:'Preparation mentale',mental_sub:'Le mental fait la difference au plus haut niveau. Decris tes defis mentaux et l\'IA te donne les techniques des meilleurs athletes.',
+    mental_ph:'J\'ai du mal a gerer la pression des grands matchs. Je suis stresse avant de tirer au but...',
+    mental_btn:'Analyser mon mental',
+    manifeste_tag:'Notre vision',manifeste_title:'Le football d\'elite,<br><em>accessible a tous.</em>',
+    manifeste_body1:'Special One est ne d\'une conviction simple : les meilleurs joueurs du monde ont acces a des coachs d\'elite, des preparateurs physiques, des psychologues du sport. Les autres non.',
+    manifeste_body2:'Nous avons change ca. En encodant dans une IA les methodes des plus grands pour les rendre accessibles a n\'importe quel joueur, n\'importe ou.',
+    manifeste_quote:'L\'excellence n\'est pas reservee a ceux qui ont de la chance. Elle appartient a ceux qui ont la methode.',
+  },
+  en:{
+    nav_home:'Home',nav_mc:'Masterclass',nav_profil:'My Profile',nav_ia:'AI Analysis',nav_cta:'Analyse my game',
+    hero_tag:'Football Intelligence Platform',
+    hero_h1:'ELITE FOOTBALL<br><span class="blue">FOR</span><br><span class="dim">EVERYONE.</span>',
+    hero_sub:'<strong>Special One</strong> is the first football intelligence platform. Masterclasses inspired by the world\'s best players. AI analysis of your game. Personalised training plans.',
+    hero_btn1:'Explore masterclasses',hero_btn2:'Analyse my game',
+    hero_stat1v:'28<b> champ.</b>',hero_stat1k:'Integrated',hero_stat2v:'30<b> lessons</b>',hero_stat2k:'Masterclasses',hero_stat3v:'AI<b> +</b>',hero_stat3k:'Analysis',
+    num1k:'Champions',num1d:'From Mbappe to Zidane. Every legend with their unique philosophy.',
+    num2k:'Masterclasses',num2d:'Technique, tactics, mindset, fitness. Every dimension of the game.',
+    num3k:'AI Modules',num3d:'Video, description, training plan, mental preparation.',
+    num4k:'Personalised',num4d:'Every analysis based on your exact profile, position and goals.',
+    how_tag:'How it works',how_title:'Three steps.<br>One <em>goal.</em>',
+    step1t:'Fill in your profile',step1d:'Position, level, playing style, 3-month goals, self-assessment. In two minutes, the AI knows exactly who you are as a player.',
+    step2t:'Explore the masterclasses',step2d:'30 lessons built around the methods of the world\'s best players. Concrete keys, precise drills, applicable at your next session.',
+    step3t:'The AI analyses and plans',step3d:'Video or description of your game. The AI compares with the world\'s best and generates your bespoke training plan.',
+    champs_tag:'28 Champions integrated',champs_title:'Those who<br><em>redefined</em> the game.',
+    ia_tag:'Artificial intelligence',ia_title:'The AI that<br><em>understands</em><br>your game.',
+    ia_p1:'Upload a video of yourself in a match or training. Describe your strengths and weaknesses in free text. <strong>The AI analyses and compares with the world\'s best players.</strong>',
+    ia_p2:'It identifies your strengths, your priority improvement areas, and creates your week-by-week programme — inspired by the methods of Real Madrid, Man City and Barcelona.',
+    ia_p3:'Not a generic report. An analysis that knows you are a 19-year-old box-to-box midfielder, that your left foot is weak, and that your goal is to reach the next level in 3 months.',
+    ia_btn:'Analyse my game now',
+    mc_tag:'Masterclass preview',mc_title:'Lessons nobody<br>has ever<br><em>given you.</em>',mc_close:'Close',
+    about_tag:'Our story',about_title:'Two brothers.<br>One <em>passion.</em>',
+    about_body:'Special One was born from an obsession: football. Two brothers, passionate about the game since childhood, who wanted to build the platform they would have needed when they played.',
+    about_body2:'We took the methods of the world\'s best clubs, encoded them into an AI, and built something accessible to everyone — from grassroots to semi-professional.',
+    about_card1_l:'The vision',about_card1_v:'Make elite training accessible to every player, regardless of level.',
+    about_card2_l:'The method',about_card2_v:'The frameworks of the world\'s best clubs, adapted to your exact profile by AI.',
+    about_card3_l:'The ambition',about_card3_v:'Become the world reference for football player development.',
+    footer_copy:'// Football Intelligence Platform — 2026',
+    mc_page_tag:'Training',mc_page_title:'<em>30</em> Masterclasses',mc_page_sub:'Lessons built around the methods of the world\'s best players and clubs. Click a lesson to access the full content.',
+    pro_tag:'Player profile',pro_title:'My <em>Profile</em>',pro_sub:'Complete your profile so the AI can personalise every analysis and training plan based on your real level, position and goals.',
+    pro_sh1:'Identity',pro_sh2:'Position & style',pro_sh3:'Physical data',pro_sh4:'Goals',pro_sh5:'Background',pro_sh6:'Self-assessment 1-10',
+    pro_save:'Save my profile',pro_saved:'Profile saved',
+    an_tag:'Artificial intelligence',an_title:'AI <em>Analysis</em>',an_sub:'The AI analyses your game and compares it with the world\'s best players, then generates a personalised training plan.',
+    an_tab1:'Video analysis',an_tab2:'Describe my game',an_tab3:'Training plan',an_tab4:'Mental preparation',
+    vid_title:'Video analysis',vid_sub:'Upload a video and configure your analysis. AI adapts: individual, specific action, or team breakdown.',
+    vid_mode_label:'Analysis mode',
+    mode_ind_t:'Individual',mode_ind_d:'You alone or with teammates. Focus on your actions.',
+    mode_action_t:'Isolated action',mode_action_d:'One specific gesture: tackle, pass, shot, duel...',
+    mode_team_t:'Team analysis',mode_team_d:'Individual report per player and section.',
+    mode_full_t:'Full match',mode_full_d:'Full-game analysis: trends, zones, progression.',
+    vid_geste_label:'Gesture to analyse (optional)',vid_ctx_label:'Extra context (optional)',
+    vid_upload_h:'Drop your video here',vid_upload_p:'// MP4, MOV — max 200MB — click or drag & drop',
+    team_players_label:'Players to analyse',team_add:'+ Add a player',team_section_label:'Sections to analyse',
+    desc_title:'Describe my game',desc_sub:'Describe your game in free text. The AI analyses and gives you expert feedback.',
+    desc_ph:'I am a 20-year-old right winger, regional level. I am quick and love dribbling but I struggle in defensive duels...',
+    desc_btn:'Analyse my game',
+    train_title:'Training plan',train_sub:'Describe your goal and level. The AI generates a structured 4-week training plan.',
+    train_ph:'22-year-old attacking midfielder, regional level. I want to improve my game vision and decision-making...',
+    train_btn:'Generate my plan',
+    mental_title:'Mental preparation',mental_sub:'The mental game makes the difference at the highest level. Describe your challenges and get techniques used by the world\'s greatest athletes.',
+    mental_ph:'I struggle to handle the pressure of big matches. I get nervous before taking penalties...',
+    mental_btn:'Analyse my mindset',
+    manifeste_tag:'Our vision',manifeste_title:'Elite football,<br><em>accessible to all.</em>',
+    manifeste_body1:'Special One was born from a simple conviction: the world\'s best players have access to elite coaches, fitness trainers and sports psychologists. Everyone else does not.',
+    manifeste_body2:'We changed that. By encoding into an AI the methods of the greatest — from Zidane to De Bruyne — to make them accessible to any player, anywhere.',
+    manifeste_quote:'Excellence is not reserved for those who are lucky. It belongs to those who have the method.',
+  },
+  es:{
+    nav_home:'Inicio',nav_mc:'Masterclass',nav_profil:'Mi Perfil',nav_ia:'Analisis IA',nav_cta:'Analizar mi juego',
+    hero_tag:'Plataforma de Inteligencia Futbolistica',
+    hero_h1:'EL FUTBOL DE<br><span class="blue">ELITE</span><br><span class="dim">PARA TODOS.</span>',
+    hero_sub:'<strong>Special One</strong> es la primera plataforma de inteligencia futbolistica. Masterclasses inspiradas en los mejores jugadores del mundo. Analisis IA de tu juego. Planes personalizados.',
+    hero_btn1:'Explorar masterclasses',hero_btn2:'Analizar mi juego',
+    hero_stat1v:'28<b> camp.</b>',hero_stat1k:'Integrados',hero_stat2v:'30<b> clases</b>',hero_stat2k:'Masterclasses',hero_stat3v:'IA<b> +</b>',hero_stat3k:'Analisis',
+    num1k:'Campeones',num1d:'De Mbappe a Zidane. Cada leyenda con su filosofia unica.',
+    num2k:'Masterclasses',num2d:'Tecnica, tactica, mental, fisico. Todas las dimensiones del juego.',
+    num3k:'Modulos IA',num3d:'Video, descripcion, plan de entrenamiento, preparacion mental.',
+    num4k:'Personalizado',num4d:'Cada analisis basado en tu perfil exacto, posicion y objetivos.',
+    how_tag:'Como funciona',how_title:'Tres pasos.<br>Un solo <em>objetivo.</em>',
+    step1t:'Rellenas tu perfil',step1d:'Posicion, nivel, estilo de juego, objetivos a 3 meses. En dos minutos, la IA sabe exactamente quien eres como jugador.',
+    step2t:'Exploras las masterclasses',step2d:'30 lecciones estructuradas en torno a los metodos de los mejores jugadores del mundo. Claves concretas y ejercicios precisos.',
+    step3t:'La IA analiza y programa',step3d:'Video o descripcion de tu juego. La IA compara con los mejores y genera tu plan de entrenamiento a medida.',
+    champs_tag:'28 Campeones integrados',champs_title:'Los que<br><em>redefinieron</em> el juego.',
+    ia_tag:'Inteligencia artificial',ia_title:'La IA que<br><em>entiende</em><br>tu juego.',
+    ia_p1:'Sube un video tuyo en un partido o entrenamiento. Describe tus fortalezas y debilidades. <strong>La IA analiza y compara con los mejores jugadores del mundo.</strong>',
+    ia_p2:'Identifica tus puntos fuertes, tus areas de mejora prioritarias, y crea tu programa semana a semana — inspirado en los metodos del Real Madrid, Man City y Barcelona.',
+    ia_p3:'No un balance generico. Un analisis que sabe que eres mediocentro de 19 anos, que tu pie izquierdo es debil, y que tu objetivo es subir de nivel en 3 meses.',
+    ia_btn:'Analizar mi juego ahora',
+    mc_tag:'Vista previa masterclasses',mc_title:'Lecciones que nadie<br>te ha dado<br><em>nunca.</em>',mc_close:'Cerrar',
+    about_tag:'Nuestra historia',about_title:'Dos hermanos.<br>Una <em>pasion.</em>',
+    about_body:'Special One nacio de una obsesion: el futbol. Dos hermanos, apasionados por el futbol desde la infancia, que quisieron crear la plataforma que habrian necesitado cuando jugaban.',
+    about_body2:'Tomamos los metodos de los mejores clubs del mundo, los codificamos en una IA y construimos algo accesible para todos — desde el jugador de base hasta el semiprofesional.',
+    about_card1_l:'La vision',about_card1_v:'Hacer el entrenamiento de elite accesible a cada jugador, sin importar su nivel.',
+    about_card2_l:'El metodo',about_card2_v:'Los marcos de los mejores clubs del mundo, adaptados a tu perfil exacto por la IA.',
+    about_card3_l:'La ambicion',about_card3_v:'Convertirse en la referencia mundial del desarrollo del jugador de futbol.',
+    footer_copy:'// Plataforma de Inteligencia Futbolistica — 2026',
+    mc_page_tag:'Formacion',mc_page_title:'<em>30</em> Masterclasses',mc_page_sub:'Lecciones construidas en torno a los metodos de los mejores jugadores y clubs del mundo. Haz clic en una leccion para ver el contenido.',
+    pro_tag:'Perfil del jugador',pro_title:'Mi <em>Perfil</em>',pro_sub:'Completa tu perfil para que la IA personalice cada analisis y plan de entrenamiento segun tu nivel, posicion y objetivos.',
+    pro_sh1:'Identidad',pro_sh2:'Posicion y estilo',pro_sh3:'Datos fisicos',pro_sh4:'Objetivos',pro_sh5:'Contexto e historial',pro_sh6:'Autoevaluacion 1-10',
+    pro_save:'Guardar mi perfil',pro_saved:'Perfil guardado',
+    an_tag:'Inteligencia artificial',an_title:'Analisis <em>IA</em>',an_sub:'La IA analiza tu juego y lo compara con los mejores jugadores del mundo, luego genera un plan de entrenamiento personalizado.',
+    an_tab1:'Analisis de video',an_tab2:'Describir mi juego',an_tab3:'Plan de entrenamiento',an_tab4:'Preparacion mental',
+    vid_title:'Analisis de video',vid_sub:'Sube un video y configura tu analisis. La IA se adapta: individual, accion especifica o colectivo.',
+    vid_mode_label:'Modo de analisis',
+    mode_ind_t:'Individual',mode_ind_d:'Tu solo o con companeros. Foco en tus acciones.',
+    mode_action_t:'Accion aislada',mode_action_d:'Un gesto preciso: tacle, pase, tiro, duelo...',
+    mode_team_t:'Analisis colectivo',mode_team_d:'Informe individual por jugador y seccion.',
+    mode_full_t:'Partido completo',mode_full_d:'Analisis completo: tendencias, zonas de juego.',
+    vid_geste_label:'Gesto a analizar (opcional)',vid_ctx_label:'Contexto extra (opcional)',
+    vid_upload_h:'Arrastra tu video aqui',vid_upload_p:'// MP4, MOV — max 200MB — clic o arrastrar',
+    team_players_label:'Jugadores a analizar',team_add:'+ Agregar jugador',team_section_label:'Secciones a analizar',
+    desc_title:'Describir mi juego',desc_sub:'Describe tu juego en texto libre. La IA analiza y te da una respuesta experta.',
+    desc_ph:'Soy extremo derecho de 20 anos, nivel regional. Soy rapido y me gustan los regates pero me cuesta en los duelos defensivos...',
+    desc_btn:'Analizar mi juego',
+    train_title:'Plan de entrenamiento',train_sub:'Describe tu objetivo y nivel. La IA genera un plan de entrenamiento estructurado de 4 semanas.',
+    train_ph:'Mediapunta de 22 anos, nivel regional. Quiero mejorar mi vision de juego y toma de decisiones...',
+    train_btn:'Generar mi plan',
+    mental_title:'Preparacion mental',mental_sub:'El mental marca la diferencia al mas alto nivel. Describe tus desafios y la IA te da las tecnicas de los mejores atletas.',
+    mental_ph:'Me cuesta manejar la presion en los grandes partidos. Me pongo nervioso antes de tirar penaltis...',
+    mental_btn:'Analizar mi mental',
+    manifeste_tag:'Nuestra vision',manifeste_title:'El futbol de elite,<br><em>accesible para todos.</em>',
+    manifeste_body1:'Special One nacio de una conviccion simple: los mejores jugadores del mundo tienen acceso a entrenadores de elite. Los demas no.',
+    manifeste_body2:'Nosotros cambiamos eso. Codificando en una IA los metodos de los mas grandes para hacerlos accesibles a cualquier jugador, en cualquier lugar.',
+    manifeste_quote:'La excelencia no esta reservada a los que tienen suerte. Pertenece a los que tienen el metodo.',
+  },
+  pt:{
+    nav_home:'Inicio',nav_mc:'Masterclass',nav_profil:'Meu Perfil',nav_ia:'Analise IA',nav_cta:'Analisar meu jogo',
+    hero_tag:'Plataforma de Inteligencia Futebolistica',
+    hero_h1:'FUTEBOL DE<br><span class="blue">ELITE</span><br><span class="dim">PARA TODOS.</span>',
+    hero_sub:'<strong>Special One</strong> e a primeira plataforma de inteligencia futebolistica. Masterclasses inspiradas nos melhores jogadores do mundo. Analise IA do teu jogo. Planos personalizados.',
+    hero_btn1:'Explorar masterclasses',hero_btn2:'Analisar meu jogo',
+    hero_stat1v:'28<b> camp.</b>',hero_stat1k:'Integrados',hero_stat2v:'30<b> aulas</b>',hero_stat2k:'Masterclasses',hero_stat3v:'IA<b> +</b>',hero_stat3k:'Analise',
+    num1k:'Campeoes',num1d:'De Mbappe a Zidane. Cada lenda com a sua filosofia unica.',
+    num2k:'Masterclasses',num2d:'Tecnica, tatica, mental, fisico. Todas as dimensoes do jogo.',
+    num3k:'Modulos IA',num3d:'Video, descricao, plano de treino, preparacao mental.',
+    num4k:'Personalizado',num4d:'Cada analise baseada no teu perfil exato, posicao e objetivos.',
+    how_tag:'Como funciona',how_title:'Tres etapas.<br>Um so <em>objetivo.</em>',
+    step1t:'Preenchas o teu perfil',step1d:'Posicao, nivel, estilo de jogo, objetivos a 3 meses. Em dois minutos, a IA sabe exatamente quem es como jogador.',
+    step2t:'Explores as masterclasses',step2d:'30 licoes estruturadas em torno dos metodos dos melhores jogadores do mundo. Chaves concretas e exercicios precisos.',
+    step3t:'A IA analisa e programa',step3d:'Video ou descricao do teu jogo. A IA compara com os melhores e gera o teu plano de treino a medida.',
+    champs_tag:'28 Campeoes integrados',champs_title:'Os que<br><em>redefiniram</em> o jogo.',
+    ia_tag:'Inteligencia artificial',ia_title:'A IA que<br><em>entende</em><br>o teu jogo.',
+    ia_p1:'Faz upload de um video teu num jogo ou treino. Descreve os teus pontos fortes e fracos. <strong>A IA analisa e compara com os melhores jogadores do mundo.</strong>',
+    ia_p2:'Identifica os teus pontos fortes, areas de melhoria prioritarias, e cria o teu programa semana a semana — inspirado nos metodos do Real Madrid, Man City e Barcelona.',
+    ia_p3:'Nao um relatorio generico. Uma analise que sabe que es medio atacante de 19 anos, que o teu pe esquerdo e fraco, e que o teu objetivo e subir de nivel em 3 meses.',
+    ia_btn:'Analisar meu jogo agora',
+    mc_tag:'Previa masterclasses',mc_title:'Licoes que<br>ninguem te deu<br><em>jamais.</em>',mc_close:'Fechar',
+    about_tag:'A nossa historia',about_title:'Dois irmaos.<br>Uma <em>paixao.</em>',
+    about_body:'Special One nasceu de uma obsessao: o futebol. Dois irmaos, apaixonados pelo futebol desde a infancia, que quiseram criar a plataforma de que teriam necessitado quando jogavam.',
+    about_body2:'Pegamos nos metodos dos melhores clubes do mundo, codificamo-los numa IA e construimos algo acessivel a todos — do jogador de base ao semiprofissional.',
+    about_card1_l:'A visao',about_card1_v:'Tornar o treino de elite acessivel a cada jogador, independentemente do nivel.',
+    about_card2_l:'O metodo',about_card2_v:'Os frameworks dos melhores clubes do mundo, adaptados ao teu perfil exato pela IA.',
+    about_card3_l:'A ambicao',about_card3_v:'Tornar-se a referencia mundial no desenvolvimento do jogador de futebol.',
+    footer_copy:'// Plataforma de Inteligencia Futebolistica — 2026',
+    mc_page_tag:'Formacao',mc_page_title:'<em>30</em> Masterclasses',mc_page_sub:'Licoes construidas em torno dos metodos dos melhores jogadores e clubes do mundo. Clica numa licao para aceder ao conteudo.',
+    pro_tag:'Perfil do jogador',pro_title:'Meu <em>Perfil</em>',pro_sub:'Completa o teu perfil para que a IA personalize cada analise e plano de treino com base no teu nivel, posicao e objetivos.',
+    pro_sh1:'Identidade',pro_sh2:'Posicao e estilo',pro_sh3:'Dados fisicos',pro_sh4:'Objetivos',pro_sh5:'Contexto e historico',pro_sh6:'Autoavaliacao 1-10',
+    pro_save:'Guardar meu perfil',pro_saved:'Perfil guardado',
+    an_tag:'Inteligencia artificial',an_title:'Analise <em>IA</em>',an_sub:'A IA analisa o teu jogo e compara-o com os melhores jogadores do mundo, depois gera um plano de treino personalizado.',
+    an_tab1:'Analise de video',an_tab2:'Descrever o meu jogo',an_tab3:'Plano de treino',an_tab4:'Preparacao mental',
+    vid_title:'Analise de video',vid_sub:'Faz upload de um video e configura a tua analise. A IA adapta-se: individual, acao isolada ou coletivo.',
+    vid_mode_label:'Modo de analise',
+    mode_ind_t:'Individual',mode_ind_d:'Tu sozinho ou com parceiros. Foco nas tuas acoes.',
+    mode_action_t:'Acao isolada',mode_action_d:'Um gesto preciso: tacle, passe, remate, duelo...',
+    mode_team_t:'Analise coletiva',mode_team_d:'Relatorio individual por jogador e seccao.',
+    mode_full_t:'Jogo completo',mode_full_d:'Analise completa: tendencias, zonas de jogo.',
+    vid_geste_label:'Gesto a analisar (opcional)',vid_ctx_label:'Contexto extra (opcional)',
+    vid_upload_h:'Arrasta o teu video aqui',vid_upload_p:'// MP4, MOV — max 200MB — clique ou arraste',
+    team_players_label:'Jogadores a analisar',team_add:'+ Adicionar jogador',team_section_label:'Seccoes a analisar',
+    desc_title:'Descrever o meu jogo',desc_sub:'Descreve o teu jogo em texto livre. A IA analisa e da-te um retorno especializado.',
+    desc_ph:'Sou extremo direito de 20 anos, nivel regional. Sou rapido e gosto de driblar mas tenho dificuldade nos duelos defensivos...',
+    desc_btn:'Analisar o meu jogo',
+    train_title:'Plano de treino',train_sub:'Descreve o teu objetivo e nivel. A IA gera um plano de treino estruturado de 4 semanas.',
+    train_ph:'Medio atacante de 22 anos, nivel regional. Quero melhorar a minha visao de jogo e tomada de decisao...',
+    train_btn:'Gerar o meu plano',
+    mental_title:'Preparacao mental',mental_sub:'O mental faz a diferenca ao mais alto nivel. Descreve os teus desafios e a IA da-te as tecnicas dos melhores atletas.',
+    mental_ph:'Tenho dificuldade em gerir a pressao dos grandes jogos. Fico nervoso antes de bater penaltis...',
+    mental_btn:'Analisar o meu mental',
+    manifeste_tag:'A nossa visao',manifeste_title:'Futebol de elite,<br><em>acessivel a todos.</em>',
+    manifeste_body1:'Special One nasceu de uma convicao simples: os melhores jogadores do mundo tem acesso a treinadores de elite. Os outros nao.',
+    manifeste_body2:'Nos mudamos isso. Codificando numa IA os metodos dos maiores para os tornar acessiveis a qualquer jogador, em qualquer lugar.',
+    manifeste_quote:'A excelencia nao e reservada aos que tem sorte. Pertence aos que tem o metodo.',
+  }
+};
+let curLang='fr';
+
+function applyLang(l){
+  curLang=l;
+  const d=TRANSLATIONS[l];
+  if(!d)return;
+  document.getElementById('langBtn').textContent=l.toUpperCase();
+  document.querySelectorAll('.nlang-opt').forEach(o=>{o.classList.remove('sel');if(o.textContent.startsWith(l.toUpperCase()))o.classList.add('sel')});
+  document.getElementById('langDd').classList.remove('open');
+
+  // NAV
+  const nts=document.querySelectorAll('.nt');
+  if(nts[0])nts[0].textContent=d.nav_home;
+  if(nts[1])nts[1].textContent=d.nav_mc;
+  if(nts[2])nts[2].textContent=d.nav_profil;
+  if(nts[3])nts[3].textContent=d.nav_ia;
+  const ncta=document.querySelector('.ncta');if(ncta)ncta.textContent=d.nav_cta;
+
+  // HERO
+  const htag=document.querySelector('.htag');if(htag)htag.textContent=d.hero_tag;
+  const h1=document.querySelector('#home h1');if(h1)h1.innerHTML=d.hero_h1;
+  const hsub=document.querySelector('.hsub');if(hsub)hsub.innerHTML=d.hero_sub;
+  const hbtns=document.querySelectorAll('.hbtns button');
+  if(hbtns[0])hbtns[0].textContent=d.hero_btn1;
+  if(hbtns[1])hbtns[1].textContent=d.hero_btn2;
+  const hstats=document.querySelectorAll('.hstat');
+  if(hstats[0]){hstats[0].querySelector('.v').innerHTML=d.hero_stat1v;hstats[0].querySelector('.k').textContent=d.hero_stat1k;}
+  if(hstats[1]){hstats[1].querySelector('.v').innerHTML=d.hero_stat2v;hstats[1].querySelector('.k').textContent=d.hero_stat2k;}
+  if(hstats[2]){hstats[2].querySelector('.v').innerHTML=d.hero_stat3v;hstats[2].querySelector('.k').textContent=d.hero_stat3k;}
+
+  // NUMS
+  const nitems=document.querySelectorAll('.num-item');
+  [{k:'num1k',dd:'num1d'},{k:'num2k',dd:'num2d'},{k:'num3k',dd:'num3d'},{k:'num4k',dd:'num4d'}].forEach(({k,dd},i)=>{
+    if(nitems[i]){
+      const nk=nitems[i].querySelector('.num-k');if(nk)nk.textContent=d[k];
+      const nd=nitems[i].querySelector('.num-d');if(nd)nd.textContent=d[dd];
+    }
+  });
+
+  // HOW
+  const howtag=document.querySelector('.how .sec-tag');if(howtag)howtag.textContent=d.how_tag;
+  const howtitle=document.querySelector('.how .sec-title');if(howtitle)howtitle.innerHTML=d.how_title;
+  const steps=document.querySelectorAll('.how-step');
+  [{t:'step1t',dd:'step1d'},{t:'step2t',dd:'step2d'},{t:'step3t',dd:'step3d'}].forEach(({t,dd},i)=>{
+    if(steps[i]){
+      const st=steps[i].querySelector('.step-t');if(st)st.textContent=d[t];
+      const sd=steps[i].querySelector('.step-d');if(sd)sd.textContent=d[dd];
+    }
+  });
+
+  // CHAMPIONS
+  const ctag=document.querySelector('.champs-sec .sec-tag');if(ctag)ctag.textContent=d.champs_tag;
+  const ctitle=document.querySelector('.champs-sec .sec-title');if(ctitle)ctitle.innerHTML=d.champs_title;
+
+  // IA SECTION
+  const iatag=document.querySelector('.ia-sec .sec-tag');if(iatag)iatag.textContent=d.ia_tag;
+  const iatitle=document.querySelector('.ia-sec .sec-title');if(iatitle)iatitle.innerHTML=d.ia_title;
+  const iaps=document.querySelectorAll('.ia-body p');
+  if(iaps[0])iaps[0].innerHTML=d.ia_p1;
+  if(iaps[1])iaps[1].innerHTML=d.ia_p2;
+  if(iaps[2])iaps[2].innerHTML=d.ia_p3;
+  const iabtn=document.querySelector('.ia-sec .btn-pri');if(iabtn)iabtn.textContent=d.ia_btn;
+
+  // MC APERCU
+  const mctag=document.querySelector('.mc-home .sec-tag');if(mctag)mctag.textContent=d.mc_tag;
+  const mctitle=document.querySelector('.mc-home .sec-title');if(mctitle)mctitle.innerHTML=d.mc_title;
+  const mcclose=document.querySelector('.mcd-close');if(mcclose)mcclose.textContent=d.mc_close;
+
+  // MANIFESTE
+  const mantag=document.querySelector('.manifeste .sec-tag');if(mantag)mantag.textContent=d.manifeste_tag;
+  const mantitle=document.querySelector('.manifeste .sec-title');if(mantitle)mantitle.innerHTML=d.manifeste_title;
+  const manps=document.querySelectorAll('.man-body p');
+  if(manps[0])manps[0].textContent=d.manifeste_body1;
+  if(manps[1])manps[1].textContent=d.manifeste_body2;
+  const manq=document.querySelector('.man-quote');if(manq)manq.textContent=d.manifeste_quote;
+
+  // APROPOS
+  const abtag=document.querySelector('.apropos .sec-tag');if(abtag)abtag.textContent=d.about_tag;
+  const abtitle=document.querySelector('.apropos-title');if(abtitle)abtitle.innerHTML=d.about_title;
+  const abps=document.querySelectorAll('.apropos-body');
+  if(abps[0])abps[0].textContent=d.about_body;
+  if(abps[1])abps[1].textContent=d.about_body2;
+  const abcards=document.querySelectorAll('.apropos-card');
+  if(abcards[0]){abcards[0].querySelector('.ac-label').textContent=d.about_card1_l;abcards[0].querySelector('.ac-val').textContent=d.about_card1_v;}
+  if(abcards[1]){abcards[1].querySelector('.ac-label').textContent=d.about_card2_l;abcards[1].querySelector('.ac-val').textContent=d.about_card2_v;}
+  if(abcards[2]){abcards[2].querySelector('.ac-label').textContent=d.about_card3_l;abcards[2].querySelector('.ac-val').textContent=d.about_card3_v;}
+  const ftcopy=document.querySelector('footer p');if(ftcopy)ftcopy.textContent=d.footer_copy;
+
+  // MASTERCLASS PAGE
+  const mptag=document.querySelector('#masterclass .sec-tag');if(mptag)mptag.textContent=d.mc_page_tag;
+  const mptitle=document.querySelector('#masterclass h2');if(mptitle)mptitle.innerHTML=d.mc_page_title;
+  const mpsub=document.querySelector('#masterclass .page-hero p');if(mpsub)mpsub.textContent=d.mc_page_sub;
+
+  // PROFIL PAGE
+  const protag=document.querySelector('#profil .sec-tag');if(protag)protag.textContent=d.pro_tag;
+  const protitle=document.querySelector('#profil h2');if(protitle)protitle.innerHTML=d.pro_title;
+  const prosub=document.querySelector('#profil .page-hero p');if(prosub)prosub.textContent=d.pro_sub;
+  const proshs=document.querySelectorAll('.pro-sh');
+  ['pro_sh1','pro_sh2','pro_sh3','pro_sh4','pro_sh5','pro_sh6'].forEach((k,i)=>{if(proshs[i]&&d[k])proshs[i].textContent=d[k];});
+  const prosave=document.querySelector('.pro-save');if(prosave)prosave.textContent=d.pro_save;
+
+  // ANALYSE PAGE
+  const antag=document.querySelector('#analyse .page-hero .sec-tag');if(antag)antag.textContent=d.an_tag;
+  const antitle=document.querySelector('#analyse h2');if(antitle)antitle.innerHTML=d.an_title;
+  const ansub=document.querySelector('#analyse .page-hero p');if(ansub)ansub.textContent=d.an_sub;
+  const antabs=document.querySelectorAll('.an-navit');
+  ['an_tab1','an_tab2','an_tab3','an_tab4'].forEach((k,i)=>{if(antabs[i]&&d[k])antabs[i].textContent=d[k];});
+
+  // VIDEO MODULE
+  const vtitle=document.querySelector('#amod-video .amod-title');if(vtitle)vtitle.textContent=d.vid_title;
+  const vsub=document.querySelector('#amod-video .amod-sub');if(vsub)vsub.textContent=d.vid_sub;
+  const vseps=document.querySelectorAll('.van-sep');
+  if(vseps[0])vseps[0].textContent=d.vid_mode_label;
+  if(vseps[1])vseps[1].textContent=d.vid_geste_label;
+  if(vseps[3])vseps[3].textContent=d.vid_ctx_label;
+  const vanopts=document.querySelectorAll('.van-opt');
+  [['mode_ind_t','mode_ind_d'],['mode_action_t','mode_action_d'],['mode_team_t','mode_team_d'],['mode_full_t','mode_full_d']].forEach(([tk,dk],i)=>{
+    if(vanopts[i]){
+      const ot=vanopts[i].querySelector('.van-opt-t');if(ot)ot.textContent=d[tk];
+      const od=vanopts[i].querySelector('.van-opt-d');if(od)od.textContent=d[dk];
+    }
+  });
+  const vuph=document.querySelector('.up-area h4');if(vuph)vuph.textContent=d.vid_upload_h;
+  const vupp=document.querySelector('.up-area p');if(vupp)vupp.textContent=d.vid_upload_p;
+  const teamadd=document.querySelector('.team-add');if(teamadd)teamadd.textContent=d.team_add;
+
+  // DESC MODULE
+  const dtitle=document.querySelector('#amod-desc .amod-title');if(dtitle)dtitle.textContent=d.desc_title;
+  const dsub=document.querySelector('#amod-desc .amod-sub');if(dsub)dsub.textContent=d.desc_sub;
+  const din=document.getElementById('desc-in');if(din)din.placeholder=d.desc_ph;
+  const dbtn=document.querySelector('#amod-desc .ai-sub');if(dbtn)dbtn.textContent=d.desc_btn;
+
+  // TRAINING MODULE
+  const ttitle=document.querySelector('#amod-training .amod-title');if(ttitle)ttitle.textContent=d.train_title;
+  const tsub=document.querySelector('#amod-training .amod-sub');if(tsub)tsub.textContent=d.train_sub;
+  const tin=document.getElementById('train-in');if(tin)tin.placeholder=d.train_ph;
+  const tbtn=document.querySelector('#amod-training .ai-sub');if(tbtn)tbtn.textContent=d.train_btn;
+
+  // MENTAL MODULE
+  const mtitle=document.querySelector('#amod-mental .amod-title');if(mtitle)mtitle.textContent=d.mental_title;
+  const msub=document.querySelector('#amod-mental .amod-sub');if(msub)msub.textContent=d.mental_sub;
+  const min2=document.getElementById('mental-in');if(min2)min2.placeholder=d.mental_ph;
+  const mbtn=document.querySelector('#amod-mental .ai-sub');if(mbtn)mbtn.textContent=d.mental_btn;
+}
+
+function toggleLang(){document.getElementById('langDd').classList.toggle('open')}
+function setLang(l){applyLang(l)}
+document.addEventListener('click',e=>{if(!document.getElementById('langWrap').contains(e.target))document.getElementById('langDd').classList.remove('open')});
+
+/* ──────────────── VIDEO MODE ──────────────── */
+let vidMode='ind';
+let selectedGestes=[];
+function selectMode(m){
+  vidMode=m;
+  document.querySelectorAll('.van-opt').forEach(o=>o.classList.remove('sel'));
+  document.getElementById('mode-'+m).classList.add('sel');
+  document.getElementById('teamSetup').style.display=(m==='team')?'block':'none';
+}
+function toggleGeste(el){
+  const g=el.getAttribute('data-g');
+  if(el.classList.contains('sel')){
+    el.classList.remove('sel');
+    selectedGestes=selectedGestes.filter(x=>x!==g);
+  } else {
+    el.classList.add('sel');
+    selectedGestes.push(g);
+  }
+}
+function addPlayerRow(){
+  const pos=['ATT','MIL','DEF','GK'];
+  const div=document.createElement('div');
+  div.className='team-row';
+  div.innerHTML=`<input class="team-inp" placeholder="Nom du joueur" type="text"><select class="team-pos">${pos.map(p=>`<option>${p}</option>`).join('')}</select>`;
+  document.getElementById('teamPlayers').appendChild(div);
+}
+function getPlayers(){
+  return Array.from(document.querySelectorAll('#teamPlayers .team-row')).map(r=>{
+    const n=r.querySelector('input').value.trim();
+    const p=r.querySelector('select').value;
+    return n?{n,p}:null;
+  }).filter(Boolean);
+}
+
+/* ──────────────── NAV ──────────────── */
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scr',scrollY>40));
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const map={home:0,masterclass:1,profil:2,analyse:3};
+  document.querySelectorAll('.nt')[map[id]].classList.add('on');
+  window.scrollTo(0,0);
+}
+
+/* ──────────────── TICKER ──────────────── */
+const tkrEl=document.getElementById('tkr');
+const rows=[...CH,...CH].map(c=>`<span class="tk-item"><span class="tk-dot"></span>${c.n} &mdash; ${c.p}</span>`).join('');
+tkrEl.innerHTML=rows+rows;
+
+/* ──────────────── CHAMPIONS ──────────────── */
+document.getElementById('cscrl').innerHTML=CH.map(c=>`
+  <div class="champ-card">
+    <div class="champ-num">${c.num}</div>
+    <div class="champ-flag">${c.f}</div>
+    <div class="champ-name">${c.n}</div>
+    <div class="champ-pos">${c.p}</div>
+    ${Object.entries(c.a).map(([k,v])=>`<div class="attr-row"><div class="attr-k">${k}</div><div class="attr-bar"><div class="attr-fill" style="width:${v}%"></div></div><div class="attr-v">${v}</div></div>`).join('')}
+  </div>`).join('');
+
+/* ──────────────── MC HOME ──────────────── */
+document.getElementById('mchg').innerHTML=MC.slice(0,6).map((m,i)=>`
+  <button class="mc-home-item" onclick="openMcd(${i})">
+    <div class="mc-home-n">${String(i+1).padStart(2,'0')}</div>
+    <div class="mc-home-cat">${m.c}</div>
+    <div class="mc-home-t">${m.n}</div>
+    <div class="mc-home-d">${m.d}</div>
+  </button>`).join('');
+
+function openMcd(i){
+  const m=MC[i];
+  document.getElementById('mcd-c').textContent=m.c;
+  document.getElementById('mcd-t').textContent=m.n;
+  document.getElementById('mcd-b').innerHTML=m.full;
+  const box=document.getElementById('mcd');
+  box.classList.add('on');
+  setTimeout(()=>box.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+function closeMcd(){document.getElementById('mcd').classList.remove('on')}
+
+/* ──────────────── MC PAGE ──────────────── */
+document.getElementById('mcpg').innerHTML=MC.map((m,i)=>`
+  <button class="mc-page-item" onclick="openMcPanel(${i},this)" id="mcp${i}">
+    <div class="mc-pn">${String(i+1).padStart(2,'0')}</div>
+    <div class="mc-pcat">${m.c}</div>
+    <div class="mc-ptit">${m.n}</div>
+    <div class="mc-pdes">${m.d}</div>
+  </button>`).join('');
+
+function openMcPanel(i,el){
+  document.querySelectorAll('.mc-page-item').forEach(x=>x.classList.remove('act'));
+  el.classList.add('act');
+  const m=MC[i];
+  document.getElementById('pan-c').textContent=m.c;
+  document.getElementById('pan-t').textContent=m.n;
+  document.getElementById('pan-b').innerHTML=m.full;
+  const panel=document.getElementById('mcp');
+  panel.classList.add('on');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+/* ──────────────── AUTO-EVAL ──────────────── */
+const aevDefs=[
+  {k:'aev-tech',l:'Technique'},
+  {k:'aev-vit',l:'Vitesse'},
+  {k:'aev-vis',l:'Vision'},
+  {k:'aev-phy',l:'Physique'},
+  {k:'aev-tete',l:'Jeu de tete'},
+  {k:'aev-men',l:'Mental'},
+  {k:'aev-pas',l:'Passe'},
+  {k:'aev-def',l:'Defense'},
+  {k:'aev-tir',l:'Tir'},
+  {k:'aev-drib',l:'Dribble'},
+];
+const aevVals={};
+aevDefs.forEach(a=>aevVals[a.k]=5);
+
+document.getElementById('aevbars').innerHTML=aevDefs.map(a=>`
+  <div class="aev-row">
+    <div class="aev-label">${a.l}</div>
+    <div class="aev-bar" id="${a.k}" onclick="setAev(event,'${a.k}')">
+      <div class="aev-fill" id="${a.k}-f" style="width:50%"></div>
+    </div>
+    <div class="aev-score" id="${a.k}-s">5</div>
+  </div>`).join('');
+
+function setAev(e,k){
+  const bar=document.getElementById(k);
+  const pct=Math.min(100,Math.max(0,((e.clientX-bar.getBoundingClientRect().left)/bar.offsetWidth)*100));
+  const val=Math.max(1,Math.round(pct/10));
+  aevVals[k]=val;
+  document.getElementById(k+'-f').style.width=(val*10)+'%';
+  document.getElementById(k+'-s').textContent=val;
+}
+
+/* ──────────────── ANALYSE TABS ──────────────── */
+function showMod(id,btn){
+  document.querySelectorAll('.amod').forEach(m=>m.classList.remove('on'));
+  document.querySelectorAll('.an-navit').forEach(b=>b.classList.remove('on'));
+  document.getElementById('amod-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ──────────────── API ──────────────── */
+/* Gestes → attributs de profil impactes (logique ciblée, pas générique) */
+const GESTE_ATTRS={
+  'Passe':['aev-pas','aev-vis'],
+  'Tir':['aev-tir'],
+  'Dribble':['aev-drib','aev-vit'],
+  'Tacle glisse':['aev-def'],
+  'Duel aerien':['aev-tete','aev-phy'],
+  'Controle de balle':['aev-tech'],
+  'Centre':['aev-pas','aev-tech'],
+  'Positionnement':['aev-vis','aev-def'],
+  'Pressing':['aev-phy','aev-def'],
+  'Deplacement sans ballon':['aev-vis','aev-vit'],
+  'Coup franc':['aev-tir','aev-tech'],
+  'Vision du jeu':['aev-vis'],
+};
+
+function getProfilContext(){
+  let p={};
+  try{p=JSON.parse(localStorage.getItem('so_profil')||'{}')}catch(e){}
+  const parts=[];
+  if(p.prenom)parts.push(`Prenom: ${p.prenom}`);
+  if(p.poste)parts.push(`Poste: ${p.poste}`);
+  if(p.niveau)parts.push(`Niveau: ${p.niveau}`);
+  if(p.style)parts.push(`Style: ${p.style}`);
+  if(p.obj3)parts.push(`Objectif: ${p.obj3}`);
+  return parts.length?`\nContexte joueur: ${parts.join(', ')}.`:'';
+}
+
+function buildVideoPrompt(fname){
+  const ctx=document.getElementById('vid-ctx').value.trim();
+  const gestures=selectedGestes.length?`\nGestes a analyser: ${selectedGestes.join(', ')}.`:'';
+  const profCtx=getProfilContext();
+
+  // Stats profil ciblées selon gestes
+  let statsContext='';
+  if(selectedGestes.length){
+    const relevantKeys=[...new Set(selectedGestes.flatMap(g=>GESTE_ATTRS[g]||[]))];
+    if(relevantKeys.length){
+      let p={};
+      try{p=JSON.parse(localStorage.getItem('so_profil')||'{}')}catch(e){}
+      const vals=relevantKeys.map(k=>{
+        const def=aevDefs.find(a=>a.k===k);
+        const v=p[k]||aevVals[k]||5;
+        return def?`${def.l}: ${v}/10`:null;
+      }).filter(Boolean);
+      if(vals.length)statsContext=`\nStats du joueur sur les attributs concernes par ce(s) geste(s): ${vals.join(', ')}. Base ton analyse sur ces donnees precisement, sans extrapoler sur des attributs non concernes.`;
+    }
+  }
+
+  const modeMap={
+    ind:'Analyse les actions individuelles du joueur, ses mouvements, ses prises de decision, sa technique.',
+    action:`Concentre-toi UNIQUEMENT sur le(s) geste(s) selectionne(s). Ne fais pas d'analyse globale.`,
+    team:`ANALYSE COLLECTIVE : genere un rapport structure avec une section distincte par joueur liste. Pour chaque joueur: points forts, axes d'amelioration, note sur 10, recommandations. Ajoute une analyse par section (mi-temps, phase offensive/defensive si disponible).`,
+    full:'Analyse le match dans son integralite : evolution du niveau au fil du temps, zones de jeu privilegiees, decisions sous fatigue, tendances.'
+  };
+
+  const lang=curLang==='fr'?'francais':curLang==='en'?'anglais':curLang==='es'?'espagnol':'portugais';
+
+  return `Tu es un coach de football expert de haut niveau. Analyse ces images extraites d'une video de football (fichier: ${fname}).
+
+INSTRUCTIONS OBLIGATOIRES:
+1. IDENTIFICATION DES JOUEURS: Identifie chaque joueur visible par son numero de maillot, sa position sur le terrain, ou ses caracteristiques physiques. Donne un nom ou identifiant a chaque joueur (ex: "Joueur #10", "Attaquant droit", etc.).
+
+2. MODE D'ANALYSE: ${modeMap[vidMode]}${gestures}${profCtx}${statsContext}${ctx?`\nContexte supplementaire: ${ctx}`:''}
+
+3. NOTES FIFA (OBLIGATOIRE): Pour chaque joueur identifie, genere une carte de stats style FIFA avec des notes entre 50 et 99 pour chaque attribut. Format EXACT a respecter:
+---STATS_JOUEUR---
+NOM: [nom/identifiant du joueur]
+VIT: [50-99]
+TIR: [50-99]
+PAS: [50-99]
+DRI: [50-99]
+DEF: [50-99]
+PHY: [50-99]
+NOTE_GLOBALE: [50-99]
+---FIN_STATS---
+
+4. ENTRAINEMENTS (OBLIGATOIRE): Genere 3 exercices d'entrainement concrets et specifiques bases sur ce que tu observes dans la video. Format:
+---ENTRAINEMENTS---
+EXERCICE 1: [nom] | DUREE: [temps] | OBJECTIF: [but] | DESCRIPTION: [comment faire]
+EXERCICE 2: [nom] | DUREE: [temps] | OBJECTIF: [but] | DESCRIPTION: [comment faire]
+EXERCICE 3: [nom] | DUREE: [temps] | OBJECTIF: [but] | DESCRIPTION: [comment faire]
+---FIN_ENTRAINEMENTS---
+
+Reponds en ${lang}.`;
+}
+
+/* ─ Extraction frames vidéo ─ */
+async function extractVideoFrames(file,numFrames){
+  return new Promise(resolve=>{
+    const url=URL.createObjectURL(file);
+    const video=document.createElement('video');
+    video.muted=true;video.playsInline=true;video.src=url;
+    video.addEventListener('loadedmetadata',()=>{
+      const dur=video.duration;
+      const canvas=document.createElement('canvas');
+      const ctx2=canvas.getContext('2d');
+      const frames=[];let i=0;
+      const times=Array.from({length:numFrames},(_,k)=>Math.max(0,(dur/(numFrames+1))*(k+1)));
+      function next(){
+        if(i>=times.length){URL.revokeObjectURL(url);resolve(frames);return;}
+        video.currentTime=times[i];
+      }
+      video.addEventListener('seeked',function(){
+        const scale=Math.min(1,640/video.videoWidth);
+        canvas.width=Math.round(video.videoWidth*scale);
+        canvas.height=Math.round(video.videoHeight*scale);
+        ctx2.drawImage(video,0,0,canvas.width,canvas.height);
+        frames.push(canvas.toDataURL('image/jpeg',0.7).split(',')[1]);
+        i++;next();
+      });
+      next();
+    });
+    video.addEventListener('error',()=>{URL.revokeObjectURL(url);resolve([]);});
+    video.load();
+  });
+}
+
+async function callAI(prompt,resId,frames){
+  try{
+    let content;
+    if(frames&&frames.length>0){
+      content=[
+        ...frames.map(b64=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}})),
+        {type:'text',text:prompt}
+      ];
+    } else {
+      content=prompt;
+    }
+    const r=await fetch('/api/chat',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content}]})
+    });
+    const data=await r.json();
+    const el=document.getElementById(resId);
+    if(data.text){
+      if(vidMode==='team'){
+        el.innerHTML='<div class="team-report"><h4>Rapport collectif</h4>'+formatTeamReport(data.text)+'</div>';
+      } else {
+        el.innerHTML=renderVideoAnalysis(data.text);
+      }
+    } else {
+      el.innerHTML='<h4>Erreur</h4><p>'+(data.error||'Erreur inconnue')+'</p>';
+    }
+  }catch(e){
+    document.getElementById(resId).innerHTML='<h4>Erreur</h4><p>'+e.message+'</p>';
+  }
+}
+
+/* ─ Rendu analyse vidéo avec stats FIFA, évolution et calendrier ─ */
+
+/* Stockage historique des stats pour évolution */
+function getSavedStats(){
+  try{return JSON.parse(localStorage.getItem('so_stats_history')||'null');}catch(e){return null;}
+}
+function saveStatsHistory(stats){
+  try{localStorage.setItem('so_stats_history',JSON.stringify(stats));}catch(e){}
+}
+
+/* Calcul évolution : compare nouvelles stats vs précédentes */
+function computeEvolution(newStats, prevStats){
+  if(!prevStats) return null;
+  const deltas={};
+  ['VIT','TIR','PAS','DRI','DEF','PHY'].forEach(k=>{
+    if(newStats[k]&&prevStats[k]){
+      deltas[k]=parseInt(newStats[k])-parseInt(prevStats[k]);
+    }
+  });
+  return deltas;
+}
+
+/* Génère un calendrier 7 jours à partir des exercices extraits */
+function buildCalendar(exercises, startDay){
+  if(!exercises.length) return '';
+  const days=['LUN','MAR','MER','JEU','VEN','SAM','DIM'];
+  const today=new Date();
+  // Distribue les exercices sur les jours non-repos
+  // Schéma : séance J1, repos J2, séance J3, séance J4, repos J5, séance J6, repos J7
+  const sessionDays=[0,2,3,5]; // indices 0-based dans la semaine
+  const restDays=[1,4,6];
+  // Assigne exercices en round-robin sur les sessionDays
+  const calData=days.map((_,i)=>{
+    const d=new Date(today);
+    d.setDate(today.getDate()+i);
+    const dayNum=d.getDate();
+    const isSession=sessionDays.includes(i);
+    const exoForDay=isSession?exercises.filter((_,ei)=>sessionDays.indexOf(i)===ei%sessionDays.length):[];
+    // Répartition équitable
+    const exIdx=sessionDays.indexOf(i);
+    const exosAssigned=exercises.filter((_,ei)=>ei%sessionDays.length===exIdx%sessionDays.length);
+    return {day:days[i],num:dayNum,isSession,isRest:restDays.includes(i),exos:exosAssigned};
+  });
+
+  const uid='cal_'+Date.now();
+  let html=`<div class="cal-wrap" id="${uid}">
+    <h4>Calendrier d'entraînement — 7 jours</h4>
+    <div class="cal-grid">`;
+
+  calData.forEach((d,i)=>{
+    const dotHtml=d.isSession?`<div class="cal-dot"></div><div class="cal-session-label">${d.exos.length} séance${d.exos.length>1?'s':''}</div>`:'';
+    const cls=d.isSession?'cal-day has-session':d.isRest?'cal-day rest':'cal-day';
+    html+=`<div class="${cls}" onclick="toggleCalDay('${uid}_d${i}')">
+      <div class="cal-dn">${d.day}</div>
+      <div class="cal-dd">${d.num}</div>
+      ${dotHtml}
+    </div>`;
+  });
+
+  html+='</div>';
+
+  // Détail par jour (caché par défaut)
+  calData.forEach((d,i)=>{
+    if(!d.isSession||!d.exos.length) return;
+    html+=`<div class="cal-detail" id="${uid}_d${i}">
+      <div class="cal-det-head">
+        <div class="cal-det-title">${d.day} ${d.num} — Entraînement</div>
+        <button class="cal-det-close" onclick="toggleCalDay('${uid}_d${i}')">✕</button>
+      </div>
+      <div class="cal-exo-list">`;
+    d.exos.forEach(ex=>{
+      html+=`<div class="cal-exo">
+        <div class="cal-exo-head"><span class="cal-exo-name">${ex.nom}</span><span class="cal-exo-dur">${ex.dur}</span></div>
+        <div class="cal-exo-obj">${ex.obj}</div>
+        <div class="cal-exo-desc">${ex.desc}</div>
+      </div>`;
+    });
+    html+='</div>';
+    // Barre de progression semaine
+    const pct=Math.round(((sessionDays.indexOf(i)+1)/sessionDays.length)*100);
+    html+=`<div class="cal-prog-bar"><div class="cal-prog-fill" style="width:${pct}%"></div></div>
+      <div class="cal-prog-label">Séance ${sessionDays.indexOf(i)+1}/${sessionDays.length} cette semaine</div>
+    </div>`;
+  });
+
+  html+='</div>';
+  return html;
+}
+
+function toggleCalDay(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  // Ferme tous les autres
+  document.querySelectorAll('.cal-detail.open').forEach(d=>{if(d.id!==id)d.classList.remove('open');});
+  el.classList.toggle('open');
+  if(el.classList.contains('open')) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function renderVideoAnalysis(txt){
+  let html='';
+  const statsBlocks=[];
+  let remaining=txt;
+
+  // Parser blocs stats FIFA
+  const statsReg=/---STATS_JOUEUR---([\s\S]*?)---FIN_STATS---/g;
+  let m;
+  while((m=statsReg.exec(txt))!==null){
+    statsBlocks.push(m[1].trim());
+    remaining=remaining.replace(m[0],'');
+  }
+
+  // Parser entraînements
+  let exercises=[];
+  const trainReg=/---ENTRAINEMENTS---([\s\S]*?)---FIN_ENTRAINEMENTS---/;
+  const tm=trainReg.exec(remaining);
+  if(tm){
+    const trainBlock=tm[1].trim();
+    remaining=remaining.replace(tm[0],'');
+    const exReg=/EXERCICE \d+: ([^|]+)\| DUREE: ([^|]+)\| OBJECTIF: ([^|]+)\| DESCRIPTION: (.+)/g;
+    let ex;
+    while((ex=exReg.exec(trainBlock))!==null){
+      exercises.push({nom:ex[1].trim(),dur:ex[2].trim(),obj:ex[3].trim(),desc:ex[4].trim()});
+    }
+  }
+
+  // Texte principal
+  html+='<h4>Analyse</h4><p>'+remaining.trim().replace(/\n/g,'<br>')+'</p>';
+
+  // Cartes FIFA + évolution
+  if(statsBlocks.length){
+    html+='<div class="fifa-cards-wrap"><h4>Stats joueurs</h4><div class="fifa-cards">';
+    statsBlocks.forEach(b=>{
+      const lines={};
+      b.split('\n').forEach(l=>{const p=l.split(':');if(p.length>=2)lines[p[0].trim()]=p.slice(1).join(':').trim();});
+      const nom=lines['NOM']||'Joueur';
+      const note=parseInt(lines['NOTE_GLOBALE'])||0;
+      const attrs=[['VIT','Vitesse'],['TIR','Tir'],['PAS','Passe'],['DRI','Dribble'],['DEF','Défense'],['PHY','Physique']];
+
+      // Évolution stats
+      const prev=getSavedStats();
+      const prevForPlayer=prev&&prev[nom]?prev[nom]:null;
+      const deltas=prevForPlayer?computeEvolution(lines,prevForPlayer):null;
+
+      // Sauvegarder nouvelles stats
+      const all=prev||{};
+      all[nom]={...lines,_ts:Date.now()};
+      saveStatsHistory(all);
+
+      // Décider couleur note globale selon variation
+      let noteCls='fc-note';
+      if(deltas){const avg=Object.values(deltas).reduce((a,b)=>a+b,0)/6;if(avg>0)noteCls='fc-note evo-up';else if(avg<0)noteCls='fc-note evo-down';}
+
+      html+=`<div class="fifa-card">
+        <div class="fc-top"><div class="${noteCls}" style="${deltas&&Object.values(deltas).reduce((a,b)=>a+b,0)>0?'color:#34d399':deltas&&Object.values(deltas).reduce((a,b)=>a+b,0)<0?'color:#f87171':''}">${note||'--'}</div><div class="fc-nom">${nom}</div></div>
+        <div class="fc-attrs">${attrs.map(([k,l])=>{
+          const v=parseInt(lines[k])||0;
+          const d=deltas&&deltas[k]!==undefined?deltas[k]:null;
+          const dHtml=d!==null?`<span class="stat-evo-delta ${d>0?'up':d<0?'down':'same'}">${d>0?'+'+d:d}</span>`:'';
+          return `<div class="fc-attr"><span class="fc-av">${v||'--'}${dHtml}</span><span class="fc-al">${l}</span></div>`;
+        }).join('')}</div>
+      </div>`;
+    });
+    html+='</div></div>';
+
+    // Widget évolution stats profil (si gestes sélectionnés)
+    if(selectedGestes.length&&statsBlocks.length){
+      const firstBlock={};
+      statsBlocks[0].split('\n').forEach(l=>{const p=l.split(':');if(p.length>=2)firstBlock[p[0].trim()]=p.slice(1).join(':').trim();});
+      // Propose de mettre à jour le profil
+      const attrMap={VIT:'aev-vit',TIR:'aev-tir',PAS:'aev-pas',DRI:'aev-drib',DEF:'aev-def',PHY:'aev-phy'};
+      const updateable=selectedGestes.flatMap(g=>GESTE_ATTRS[g]||[]);
+      if(updateable.length){
+        html+=`<div class="stat-evo-wrap">
+          <h4>Évolution de ton profil</h4>
+          <div class="stat-evo-grid">`;
+        // Affiche les stats du profil impactées
+        updateable.slice(0,6).forEach(key=>{
+          const def=aevDefs.find(a=>a.k===key);
+          if(!def) return;
+          const cur=aevVals[key]||5;
+          // Cherche l'attribut FIFA correspondant
+          const fifaKey=Object.entries(attrMap).find(([_,v])=>v===key)?.[0];
+          const fifaVal=fifaKey?parseInt(firstBlock[fifaKey])||null:null;
+          // Calcul delta : si FIFA > 70, considère amélioration (+1 sur 10), si <55 = régression
+          let delta=0;
+          if(fifaVal!==null){if(fifaVal>=75)delta=1;else if(fifaVal>=65)delta=0;else delta=-1;}
+          const newVal=Math.max(1,Math.min(10,cur+delta));
+          const pct=(newVal/10)*100;
+          const dStr=delta>0?'+'+delta:delta<0?''+delta:'=';
+          const dCls=delta>0?'up':delta<0?'down':'same';
+          html+=`<div class="stat-evo-item">
+            <div class="stat-evo-val">${newVal}<span class="stat-evo-delta ${dCls}">${dStr}</span></div>
+            <div class="stat-evo-label">${def.l}</div>
+            <div class="stat-evo-bar"><div class="stat-evo-fill" style="width:${pct}%"></div></div>
+          </div>`;
+          // Met à jour le profil automatiquement
+          if(delta!==0){aevVals[key]=newVal;const f=document.getElementById(key+'-f');const s=document.getElementById(key+'-s');if(f)f.style.width=(newVal*10)+'%';if(s)s.textContent=newVal;saveProfil();}
+        });
+        html+='</div><div style="font-size:11px;color:var(--muted);margin-top:10px;font-style:italic">Tes stats de profil ont été mises à jour selon cette analyse.</div></div>';
+      }
+    }
+  }
+
+  // Entraînements liste + calendrier
+  if(exercises.length){
+    html+='<div class="train-wrap"><h4>Entraînements recommandés</h4>';
+    exercises.forEach(ex=>{
+      html+=`<div class="train-card">
+        <div class="tr-head"><span class="tr-nom">${ex.nom}</span><span class="tr-dur">${ex.dur}</span></div>
+        <div class="tr-obj">Objectif: ${ex.obj}</div>
+        <div class="tr-desc">${ex.desc}</div>
+      </div>`;
+    });
+    html+='</div>';
+    // Calendrier visuel 7 jours
+    html+=buildCalendar(exercises);
+  }
+
+  return html;
+}
+
+function formatTeamReport(txt){
+  // Divise le texte brut en blocs par joueur (heuristique)
+  const players=getPlayers();
+  if(!players.length){
+    return '<p>'+txt.replace(/\n/g,'<br>')+'</p>';
+  }
+  // Essaie de matcher les sections par nom de joueur
+  let html='';
+  let remaining=txt;
+  players.forEach(({n,p})=>{
+    const idx=remaining.toLowerCase().indexOf(n.toLowerCase());
+    if(idx>=0){
+      const end=remaining.toLowerCase().indexOf('\n\n',idx+n.length);
+      const block=end>-1?remaining.slice(idx,end):remaining.slice(idx);
+      remaining=remaining.replace(block,'').trim();
+      html+=`<div class="player-section"><div class="ps-head"><div class="ps-name">${n}</div><div class="ps-pos">${p}</div></div><div class="ps-body">${block.replace(/\n/g,'<br>')}</div></div>`;
+    } else {
+      html+=`<div class="player-section"><div class="ps-head"><div class="ps-name">${n}</div><div class="ps-pos">${p}</div></div><div class="ps-body"><em>Section non identifiee dans le rapport.</em></div></div>`;
+    }
+  });
+  if(remaining.trim()){html+='<div class="player-section"><div class="ps-body">'+remaining.replace(/\n/g,'<br>')+'</div></div>';}
+  return html;
+}
+
+function setLoading(id,msg){
+  const el=document.getElementById(id);
+  el.className='ai-res on';
+  el.innerHTML='<h4>'+msg+'</h4><div class="ld-dots"><div class="ld-dot"></div><div class="ld-dot"></div><div class="ld-dot"></div></div>';
+}
+
+async function handleVid(input){
+  if(!input.files[0])return;
+  setLoading('vres',curLang==='en'?'Extracting frames...':curLang==='es'?'Extrayendo...':curLang==='pt'?'Extraindo...':'Extraction des images...');
+  let frames=[];
+  try{frames=await extractVideoFrames(input.files[0],20);}catch(e){}
+  setLoading('vres',curLang==='en'?'Analysing...':curLang==='es'?'Analizando...':curLang==='pt'?'Analisando...':'Analyse en cours');
+  callAI(buildVideoPrompt(input.files[0].name),'vres',frames);
+}
+
+function doDesc(){
+  const txt=document.getElementById('desc-in').value.trim();
+  if(!txt){alert('Decris ton jeu avant de lancer.');return;}
+  setLoading('dres','Analyse en cours');
+  const profCtx=getProfilContext();
+  callAI(`Tu es un coach de football expert. Analyse ce profil de joueur et donne : 1) Les 3 points forts 2) Les 3 axes d'amelioration prioritaires 3) Les joueurs professionnels dont ce joueur se rapproche et pourquoi 4) 3 exercices specifiques immediatement applicables. Sois precis, structure, professionnel. Reponds en ${curLang==='en'?'anglais':curLang==='es'?'espagnol':curLang==='pt'?'portugais':'francais'}. Profil: ${txt}${profCtx}`,'dres');
+}
+function doTraining(){
+  const txt=document.getElementById('train-in').value.trim();
+  if(!txt){alert('Decris ton objectif avant de lancer.');return;}
+  setLoading('tres','Generation du plan');
+  const profCtx=getProfilContext();
+  callAI(`Tu es preparateur physique et coach tactique de football professionnel. Genere un plan d'entrainement detaille sur 4 semaines. Structure par semaine avec seances quotidiennes. Inclus exercices techniques, physiques, tactiques et mentaux avec temps de repos. Inspire-toi des methodes du Real Madrid, Manchester City et Barcelone. Reponds en ${curLang==='en'?'anglais':curLang==='es'?'espagnol':curLang==='pt'?'portugais':'francais'}. Objectif: ${txt}${profCtx}`,'tres');
+}
+function doMental(){
+  const txt=document.getElementById('mental-in').value.trim();
+  if(!txt){alert('Decris tes defis mentaux avant de lancer.');return;}
+  setLoading('mres','Analyse mentale en cours');
+  callAI(`Tu es psychologue du sport et coach mental de haut niveau. Analyse les defis mentaux de ce joueur et donne : causes probables, techniques concretes des plus grands athletes (Ronaldo, Federer, LeBron), programme sur 3 semaines. Reponds en ${curLang==='en'?'anglais':curLang==='es'?'espagnol':curLang==='pt'?'portugais':'francais'}. Situation: ${txt}`,'mres');
+}
+
+/* ──────────────── PROFIL SAVE/LOAD ──────────────── */
+const FIELDS=['prenom','nom','age','nat','club','email','poste','poste2','pied','niveau','style','model','sys','obj3','amelio','fort','seances','annees','ctx','bless','palm','vid','mental','diet','taille','poids','vit','end','puis','explo','vo2','km'];
+function saveProfil(){
+  const p={};
+  FIELDS.forEach(k=>{const el=document.getElementById('p-'+k);if(el)p[k]=el.value});
+  aevDefs.forEach(a=>p[a.k]=aevVals[a.k]);
+  try{localStorage.setItem('so_profil',JSON.stringify(p))}catch(e){}
+  const ok=document.getElementById('saveok');
+  ok.style.display='block';
+  setTimeout(()=>ok.style.display='none',4000);
+}
+function loadProfil(){
+  let p={};
+  try{p=JSON.parse(localStorage.getItem('so_profil')||'{}')}catch(e){}
+  FIELDS.forEach(k=>{const el=document.getElementById('p-'+k);if(el&&p[k])el.value=p[k]});
+  aevDefs.forEach(a=>{
+    if(p[a.k]){
+      aevVals[a.k]=p[a.k];
+      const f=document.getElementById(a.k+'-f');
+      const s=document.getElementById(a.k+'-s');
+      if(f)f.style.width=(p[a.k]*10)+'%';
+      if(s)s.textContent=p[a.k];
+    }
+  });
+}
+
+/* ──────────────── SCROLL REVEAL ──────────────── */
+const srObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.07});
+document.querySelectorAll('.sr').forEach(el=>srObs.observe(el));
+
+/* ──────────────── INIT ──────────────── */
+window.addEventListener('load',()=>{
+  loadProfil();
+  setTimeout(()=>document.getElementById('ldr').classList.add('out'),2600);
+});
+</script>
+</body>
+</html>
