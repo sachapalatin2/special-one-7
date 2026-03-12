@@ -423,6 +423,7 @@ footer p{font-size:11px;color:rgba(255,255,255,.08);font-family:'DM Mono',monosp
 .ps-stat span{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#fff}
 .ps-stat small{display:block;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
 </style>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -2076,6 +2077,7 @@ function setLoading(id,msg){
 
 async function handleVid(input){
   if(!input.files[0])return;
+  if(window.va) window.va('event', { name: 'video_uploaded' });
   setLoading('vres',curLang==='en'?'Extracting frames...':curLang==='es'?'Extrayendo...':curLang==='pt'?'Extraindo...':'Extraction des images...');
   let frames=[];
   try{frames=await extractVideoFrames(input.files[0],20);}catch(e){}
